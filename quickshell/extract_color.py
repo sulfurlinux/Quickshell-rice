@@ -61,19 +61,19 @@ if __name__ == "__main__":
             "accent": accent
         }
 
-        # 1. JSON für Quickshell speichern
+        # 1. Save JSON theme for Quickshell
         theme_file = os.path.join(cache_dir, 'quickshell_theme.json')
         with open(theme_file, 'w') as f:
             json.dump(theme_data, f)
 
-        # 2. Farbdatei für Hyprlock speichern
+        # 2. Save color file for Hyprlock
         hyprlock_conf = os.path.join(cache_dir, 'hyprlock_colors.conf')
         with open(hyprlock_conf, 'w') as f:
             f.write(f"$accent = rgb({accent.lstrip('#')})\n")
             f.write(f"$background = rgb(1e1e2e)\n")
             f.write(f"$text = rgb(cdd6f4)\n")
 
-        # 3. Direkt den Hintergrundpfad in die echte hyprlock.conf schreiben
+        # 3. Write the background path into the hyprlock.conf
         hyprlock_main_conf = os.path.expanduser('~/.config/hypr/hyprlock.conf')
         if os.path.exists(hyprlock_main_conf):
             with open(hyprlock_main_conf, 'r') as f:

@@ -4,6 +4,8 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Roadmap
 
+# FIX THE LOCKSCREEN
+### Center the clock
 
 - [x] Logout menu
 - [x] Launcher

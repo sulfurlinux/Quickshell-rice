@@ -194,7 +194,7 @@ print(json.dumps(res))
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
-        // Wallpaper auswählen – speichert nur den Pfad, die echte Farbe holt sich das Python-Pillow-Skript
+        // Chose Wallpaper – speichert nur den Pfad, die echte Farbe holt sich das Python-Pillow-Skript (edit here)
         if (execCmd.startsWith("wallpaper_select:")) {
             let imgPath = execCmd.replace("wallpaper_select:", "")
             let pyScript = `
