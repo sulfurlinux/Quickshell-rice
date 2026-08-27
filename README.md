@@ -50,7 +50,3 @@ The current plan is to prioritize the core desktop experience before adding smal
 5. Add Spotify and Discord scratchpads
 6. Add system information / fetch
 7. Polish and optimize the entire rice
-
-## Status
-
-This is a work in progress. The existing configuration is being developed incrementally rather than rebuilt from scratch.
