@@ -1,4 +1,5 @@
 # Quickshell-rice
+## FIX ANIMATONS
 
 A personal Linux desktop rice built around **Hyprland** and **Quickshell**.
 
