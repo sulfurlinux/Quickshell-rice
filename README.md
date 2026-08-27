@@ -1,5 +1,5 @@
 # Quickshell-rice
-
+A personal Linux desktop rice built around Hyprland and Quickshell.
 ## Todo
 
 1. FIX THE LOCKSCREEN
