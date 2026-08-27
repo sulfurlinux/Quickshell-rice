@@ -7,7 +7,7 @@ PanelWindow {
     id: wallpaperRoot
     visible: true
 
-    color: "#000000" // Verhindert den "Flashbang" beim Start
+    color: "#000000" // Prevents the "flashbang" on startup
 
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -68,7 +68,7 @@ PanelWindow {
 
         onStatusChanged: {
             if (status === Image.Error) {
-                console.log("Fehler beim Laden des Wallpapers: " + wallpaperRoot.wallpaperPath)
+                console.log("Error loading wallpaper: " + wallpaperRoot.wallpaperPath)
             }
         }
     }
