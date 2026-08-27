@@ -5,7 +5,10 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 ## Roadmap
 
 # FIX THE LOCKSCREEN
+## Potential Errors in extract_color.py
 ### Center the clock
+
+
 
 - [x] Logout menu
 - [x] Launcher
