@@ -1,3 +1,4 @@
+-- Miscellaneous Hyprland settings.
 hl.config({
     misc = {
         force_default_wallpaper = -1,
