@@ -27,11 +27,11 @@ PanelWindow {
     property var appHistory: {}
 
     property var systemCommands: [
-        { name: "/reboot", exec: "systemctl reboot", desc: "System neu starten" },
-        { name: "/shutdown", exec: "systemctl poweroff", desc: "PC herunterfahren" },
-        { name: "/lock", exec: "hyprlock", desc: "Bildschirm sperren" },
-        { name: "/logout", exec: "loginctl terminate-user $USER", desc: "Aus Session abmelden" },
-        { name: "/wallpaper", exec: "list_wallpapers", desc: "Wallpaper auswählen" }
+        { name: "/reboot", exec: "systemctl reboot", desc: "Restart the system" },
+        { name: "/shutdown", exec: "systemctl poweroff", desc: "Shut down the PC" },
+        { name: "/lock", exec: "hyprlock", desc: "Lock the screen" },
+        { name: "/logout", exec: "loginctl terminate-user $USER", desc: "Log out of the session" },
+        { name: "/wallpaper", exec: "list_wallpapers", desc: "Select a wallpaper" }
     ]
 
     ListModel {
@@ -194,7 +194,7 @@ print(json.dumps(res))
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
-        // Chose Wallpaper – Stores only the path, the python pillow script gets the real color
+        // Choose wallpaper – stores only the path; the Python Pillow script gets the actual color
         if (execCmd.startsWith("wallpaper_select:")) {
             let imgPath = execCmd.replace("wallpaper_select:", "")
             let pyScript = `
@@ -278,7 +278,7 @@ with open(path, 'w') as f:
             anchors.margins: 16
             spacing: 12
 
-            // Searchbar
+            // Search bar
             Rectangle {
                 Layout.fillWidth: true
                 height: 42
@@ -333,7 +333,7 @@ with open(path, 'w') as f:
                 }
             }
 
-            // --- APP LISTE ---
+            // --- APP LIST ---
             ScrollView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
