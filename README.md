@@ -6,7 +6,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 # FIX THE LOCKSCREEN
 ## Potential Errors in extract_color.py
-### Center the clock
+### Center the clock in quickshell/bars/bar.qml
 
 
 
