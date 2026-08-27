@@ -194,7 +194,7 @@ print(json.dumps(res))
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
-        // Chose Wallpaper – speichert nur den Pfad, die echte Farbe holt sich das Python-Pillow-Skript (edit here)
+        // Chose Wallpaper – Stores only the path, the python pillow script gets the real color
         if (execCmd.startsWith("wallpaper_select:")) {
             let imgPath = execCmd.replace("wallpaper_select:", "")
             let pyScript = `
@@ -278,7 +278,7 @@ with open(path, 'w') as f:
             anchors.margins: 16
             spacing: 12
 
-            // --- SUCHLEISTE ---
+            // Searchbar
             Rectangle {
                 Layout.fillWidth: true
                 height: 42
@@ -299,7 +299,7 @@ with open(path, 'w') as f:
                     TextField {
                         id: searchInput
                         Layout.fillWidth: true
-                        placeholderText: "App suchen oder / für Befehle..."
+                        placeholderText: "> "
                         placeholderTextColor: theme ? theme.subtext : "#a6adc8"
                         color: theme ? theme.text : "#cdd6f4"
                         font.pixelSize: 14
