@@ -30,7 +30,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
 - [ ] Notifications
-- [ ]Notification center
+  - [ ] Notification center
 
 ## Development order
 
