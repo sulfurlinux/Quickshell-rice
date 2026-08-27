@@ -4,9 +4,11 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Todo
 
-1. FIX THE LOCKSCREEN
-2. Potential Errors in extract_color.py (unlikely)
-3. Center the clock in quickshell/bars/bar.qml
+- FIX THE LOCKSCREEN
+- Center the clock
+- Fix the Workspace order
+- Fix the scratchpad numbers
+- Fix the broken characters
 
 ## Roadmap
 
@@ -30,13 +32,14 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
 - [ ] Notifications
+  - [ ] Notification center
 
 ## Development order
 
 The current plan is to prioritize the core desktop experience before adding smaller features:
 
-1. Finish the bar
-2. Add notifications
+1. Add notifications
+2. Finish the bar
 3. Finish the wallpaper and dynamic theme system
 4. Customize the lockscreen / login screen
 5. Add system information / fetch
