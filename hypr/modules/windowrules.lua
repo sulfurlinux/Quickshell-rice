@@ -1,3 +1,4 @@
+-- Window rules.
 local suppressMaximizeRule = hl.window_rule({
     name = "suppress-maximize-events",
     match = { class = ".*" },
@@ -24,5 +25,5 @@ hl.window_rule({
     float = true,
 })
 
--- Keep this handle available if the rule needs to be toggled later.
+-- Keep the handle available if the rule needs to be toggled later.
 -- suppressMaximizeRule:set_enabled(false)
