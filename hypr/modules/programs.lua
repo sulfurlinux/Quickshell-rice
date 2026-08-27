@@ -1,3 +1,4 @@
+-- Applications used by the Hyprland configuration.
 return {
     terminal = "ghostty",
     fileManager = "dolphin",
