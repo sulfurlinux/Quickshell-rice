@@ -11,6 +11,7 @@ hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(programs.menu))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("pkill qs; sleep 0.2; qs &"))
 
