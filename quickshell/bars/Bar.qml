@@ -178,7 +178,7 @@ PanelWindow {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
 
-                // Mikrofon
+                // Microphone
                 Rectangle {
                     height: 28
                     implicitWidth: micRow.implicitWidth + 12
@@ -225,7 +225,7 @@ PanelWindow {
                     }
                 }
 
-                // Lautsprecher
+                // Speaker
                 Rectangle {
                     height: 28
                     implicitWidth: sinkRow.implicitWidth + 12
