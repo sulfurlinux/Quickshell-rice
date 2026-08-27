@@ -1,15 +1,15 @@
 -- Main Hyprland configuration
--- Each concern lives in its own module for easier maintenance.
+-- Each concern lives in its own module under ./modules.
 
-require("scratchpads")
-require("monitors")
-require("programs")
-require("autostart")
-require("environment")
-require("permissions")
-require("lookandfeel")
-require("layouts")
-require("misc")
-require("input")
-require("binds")
-require("windowrules")
+require("modules.scratchpads")
+require("modules.monitors")
+require("modules.programs")
+require("modules.autostart")
+require("modules.environment")
+require("modules.permissions")
+require("modules.lookandfeel")
+require("modules.layouts")
+require("modules.misc")
+require("modules.input")
+require("modules.binds")
+require("modules.windowrules")
