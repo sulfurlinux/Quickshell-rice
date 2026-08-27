@@ -38,7 +38,7 @@ def get_dominant_color(img_path):
         return '#{:02x}{:02x}{:02x}'.format(r, g, b)
 
     except Exception as e:
-        print(f"Fehler: {e}")
+        print(f"Error: {e}")
 
     return "#cba6f7"
 
