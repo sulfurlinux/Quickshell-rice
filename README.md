@@ -2,13 +2,13 @@
 
 A personal Linux desktop rice built around Hyprland and Quickshell.
 
+## Todo
+
+1. FIX THE LOCKSCREEN
+2. Potential Errors in extract_color.py (unlikely)
+3. Center the clock in quickshell/bars/bar.qml
+
 ## Roadmap
-
-# FIX THE LOCKSCREEN
-## Potential Errors in extract_color.py
-### Center the clock in quickshell/bars/bar.qml
-
-
 
 - [x] Logout menu
 - [x] Launcher
