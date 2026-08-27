@@ -1,5 +1,4 @@
 -- Main Hyprland configuration
--- Each concern lives in its own module under ./modules.
 
 require("modules.scratchpads")
 require("modules.monitors")

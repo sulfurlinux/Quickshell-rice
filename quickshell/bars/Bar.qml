@@ -28,7 +28,7 @@ PanelWindow {
     implicitHeight: 40
     color: theme ? theme.background : "#1e1e2e"
 
-    // --- UHRZEIT ---
+    // Clock
     Process {
         id: timeProcess
         command: ["date", "+%H:%M"]
@@ -45,7 +45,7 @@ PanelWindow {
         onTriggered: timeProcess.running = true
     }
 
-    // --- AUDIO SYSTEM (SINK / LAUTSPRECHER) ---
+    // Audio sink, volume and mute status of the speaker
     Process {
         id: sinkProcess
         command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
@@ -62,7 +62,7 @@ PanelWindow {
         }
     }
 
-    // --- AUDIO SYSTEM (SOURCE / MIKROFON) ---
+    // Audio source, volume and mute status of the microphone
     Process {
         id: sourceProcess
         command: ["wpctl", "get-volume", "@DEFAULT_SOURCE@"]
@@ -120,7 +120,7 @@ PanelWindow {
             anchors.bottomMargin: 6
             spacing: 12
 
-            // --- 1. WORKSPACES (LINKS) ---
+            // Workspaces (left)
             Row {
                 spacing: 6
                 Layout.alignment: Qt.AlignLeft
@@ -160,7 +160,7 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            // --- 2. UHRZEIT (MITTE) ---
+            // Clock (center)
             Text {
                 text: root.currentTime
                 color: theme ? theme.text : "#cdd6f4"
@@ -173,12 +173,12 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            // --- 3. RECHTS (AUDIO) ---
+            // Audio (right)
             RowLayout {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
 
-                // Mikrofon
+                // Microphone
                 Rectangle {
                     height: 28
                     implicitWidth: micRow.implicitWidth + 12
@@ -225,7 +225,7 @@ PanelWindow {
                     }
                 }
 
-                // Lautsprecher
+                // Speaker
                 Rectangle {
                     height: 28
                     implicitWidth: sinkRow.implicitWidth + 12
