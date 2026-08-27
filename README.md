@@ -1,41 +1,28 @@
 # Quickshell-rice
 
-A personal Linux desktop rice built around **Hyprland** and **Quickshell**.
-
-## Components
-
-- Hyprland
-- Quickshell
-- Fish
-- Ghostty
-- Fastfetch
+A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Roadmap
 
-### Done
 
 - [x] Logout menu
 - [x] Launcher
-
-### Partially done
-
 - [ ] Wallpaper system
-  - [ ] Wallpaper switcher in launcher
+  - [x] Wallpaper switcher in launcher
   - [ ] Investigate animated wallpapers
 - [ ] Dynamic theme system
-  - [ ] Extract color palette from wallpaper
-  - [ ] Integrate the generated palette with Quickshell and Hyprland
+  - [x] Extract color palette from wallpaper
+  - [x] Integratation in Quickshell
+  - [ ] Integratation in Hyprland
 - [ ] Bar
   - [ ] Music
   - [ ] Dynamic workspaces
-  - [ ] Audio meter
+  - [x] Audio meter
   - [ ] Cava
   - [ ] System resource usage
-
-### Planned
-
+  - [x] Clock
 - [ ] Customize lockscreen / login screen
-- [ ] Custom Spotify and Discord scratchpads inspired by Caelestia Shell
+- [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
 - [ ] Notifications
 
@@ -44,9 +31,8 @@ A personal Linux desktop rice built around **Hyprland** and **Quickshell**.
 The current plan is to prioritize the core desktop experience before adding smaller features:
 
 1. Finish the bar
-2. Finish the wallpaper and dynamic theme system
-3. Add notifications
+2. Add notifications
+3. Finish the wallpaper and dynamic theme system
 4. Customize the lockscreen / login screen
-5. Add Spotify and Discord scratchpads
-6. Add system information / fetch
-7. Polish and optimize the entire rice
+5. Add system information / fetch
+6. Polish and optimize the entire rice
