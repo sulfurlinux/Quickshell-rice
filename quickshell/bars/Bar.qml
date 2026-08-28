@@ -162,11 +162,12 @@ PanelWindow {
 
             // Clock (center)
             Text {
+                anchors.centerIn: parent
+
                 text: root.currentTime
                 color: theme ? theme.text : "#cdd6f4"
-                font.pixelSize: 14
+                font.pixelSize: 15
                 font.bold: true
-                Layout.alignment: Qt.AlignHCenter
             }
 
             Item {
