@@ -7,11 +7,11 @@ import "./bars"
 Scope {
     id: root
 
-    // Config-Toggle
+    // Config toggle
     property bool showOnAllScreens: true
     property string primaryMonitorName: "DP-1"
 
-    // Zentrales, dynamisches Theme-Objekt mit Fallback-Farben
+    // Central dynamic theme object with fallback colors
     property var currentTheme: {
         "background": "#1e1e2e",
         "surface": "#313244",
@@ -20,7 +20,7 @@ Scope {
         "accent": "#cba6f7"
     }
 
-    // Timer, der regelmäßig prüft, ob ein neues Wallpaper-Theme geschrieben wurde
+    // Timer that regularly checks whether a new wallpaper theme has been written
     Timer {
         interval: 1000
         running: true
@@ -52,13 +52,13 @@ if os.path.exists(path):
         }
     }
 
-    // Instanziere den Launcher einmal zentral und übergebe das dynamische Theme
+    // Instantiate the launcher once centrally and pass the dynamic theme to it
     Launcher {
         id: globalLauncher
         theme: root.currentTheme
     }
 
-    // IPC-Handler für den Hotkey
+    // IPC handler for the hotkey
     IpcHandler {
         target: "launcher"
 
@@ -67,7 +67,7 @@ if os.path.exists(path):
         }
     }
 
-    // --- WALLPAPER AUF ALLEN/GEWÄHLTEN MONITOREN ---
+    // --- WALLPAPER ON ALL/SELECTED MONITORS ---
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens
@@ -81,7 +81,7 @@ if os.path.exists(path):
         }
     }
 
-    // --- BAR AUF ALLEN/GEWÄHLTEN MONITOREN ---
+    // --- BAR ON ALL/SELECTED MONITORS ---
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens

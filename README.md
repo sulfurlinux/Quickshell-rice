@@ -8,6 +8,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - Center the clock
 - Fix the Workspace order
 - Fix the scratchpad numbers
+- Fix the broken characters
 
 ## Roadmap
 
@@ -21,6 +22,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
   - [x] Integratation in Quickshell
   - [ ] Integratation in Hyprland
 - [ ] Bar
+  - [ ] Logout menu button
   - [ ] Music
   - [ ] Dynamic workspaces
   - [x] Audio meter

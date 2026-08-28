@@ -7,7 +7,7 @@ PanelWindow {
     id: wallpaperRoot
     visible: true
 
-    color: "#000000" // Verhindert den "Flashbang" beim Start
+    color: "#000000" // Prevents the "flashbang" on startup
 
     WlrLayershell.layer: WlrLayer.Background
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
