@@ -4,8 +4,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Todo
 
-- FIX THE LOCKSCREEN
-- Center the clock
+- ## Center the clock
 - Fix the Workspace order
 - Fix the scratchpad numbers
 - Fix the broken characters
