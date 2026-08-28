@@ -22,6 +22,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
   - [x] Integratation in Quickshell
   - [ ] Integratation in Hyprland
 - [ ] Bar
+  - [ ] Logout menu button
   - [ ] Music
   - [ ] Dynamic workspaces
   - [x] Audio meter
