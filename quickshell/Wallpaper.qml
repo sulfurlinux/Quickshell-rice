@@ -68,7 +68,7 @@ PanelWindow {
 
         onStatusChanged: {
             if (status === Image.Error) {
-                console.log("Fehler beim Laden des Wallpapers: " + wallpaperRoot.wallpaperPath)
+                console.log("Encountered Error while loading the Wallpaper: " + wallpaperRoot.wallpaperPath)
             }
         }
     }
