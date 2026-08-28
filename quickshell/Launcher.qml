@@ -299,7 +299,7 @@ with open(path, 'w') as f:
                     TextField {
                         id: searchInput
                         Layout.fillWidth: true
-                        placeholderText: "> "
+                        placeholderText: "Launcher"
                         placeholderTextColor: theme ? theme.subtext : "#a6adc8"
                         color: theme ? theme.text : "#cdd6f4"
                         font.pixelSize: 14
