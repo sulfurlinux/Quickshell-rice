@@ -9,6 +9,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Roadmap
 
+- [ ] Fancy Text cursor in the Terminal
 - [x] Logout menu
 - [x] Launcher
 - [ ] Wallpaper system
