@@ -42,4 +42,4 @@ The current plan is to prioritize the core desktop experience before adding smal
 3. Finish the wallpaper and dynamic theme system
 4. Customize the lockscreen / login screen
 5. Add system information / fetch
-6. Polish and optimize the entire rice
+6. Optimize the rice
