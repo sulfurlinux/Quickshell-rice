@@ -3,6 +3,7 @@ local programs = require("modules.programs")
 local mainMod = "SUPER"
 
 -- Applications.
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(programs.menu))
