@@ -95,7 +95,10 @@ PanelWindow {
                                 anchors.fill: parent
                                 anchors.margins: -6
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: modelData.dismiss()
+                                onClicked: mouse => {
+                                    mouse.accepted = true
+                                    modelData.dismiss()
+                                }
                             }
                         }
                     }
@@ -125,7 +128,10 @@ PanelWindow {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
-                    onClicked: modelData.dismiss()
+                    onClicked: mouse => {
+                        mouse.accepted = true
+                        modelData.invokeDefaultAction()
+                    }
                 }
             }
         }
