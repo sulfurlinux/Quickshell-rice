@@ -30,4 +30,8 @@ QtObject {
     function selectAreaClipboard() {
         run(["sh", "-c", "geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" - | wl-copy --type image/png"])
     }
+
+    function selectAreaSaveAndCopy() {
+        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\" && grim -g \"$geometry\" - | wl-copy --type image/png"])
+    }
 }
