@@ -173,6 +173,7 @@ PanelWindow {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
 
+                /*
                 Rectangle {
                     height: 28
                     width: 52
@@ -198,6 +199,7 @@ PanelWindow {
                         }
                     }
                 }
+                */
 
                 Rectangle {
                     height: 28
