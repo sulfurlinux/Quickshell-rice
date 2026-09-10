@@ -3,15 +3,14 @@ import Quickshell.Io
 import QtQuick
 import "."
 import "./bars"
+import "./notifications"
 
 Scope {
     id: root
 
-    // Config toggle
     property bool showOnAllScreens: true
     property string primaryMonitorName: "DP-1"
 
-    // Central dynamic theme object with fallback colors
     property var currentTheme: {
         "background": "#1e1e2e",
         "surface": "#313244",
@@ -20,7 +19,6 @@ Scope {
         "accent": "#cba6f7"
     }
 
-    // Timer that regularly checks whether a new wallpaper theme has been written
     Timer {
         interval: 1000
         running: true
@@ -52,13 +50,11 @@ if os.path.exists(path):
         }
     }
 
-    // Instantiate the launcher once centrally and pass the dynamic theme to it
     Launcher {
         id: globalLauncher
         theme: root.currentTheme
     }
 
-    // IPC handler for the hotkey
     IpcHandler {
         target: "launcher"
 
@@ -67,7 +63,10 @@ if os.path.exists(path):
         }
     }
 
-    // --- WALLPAPER ON ALL/SELECTED MONITORS ---
+    Notifications {
+        theme: root.currentTheme
+    }
+
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens
@@ -81,7 +80,6 @@ if os.path.exists(path):
         }
     }
 
-    // --- BAR ON ALL/SELECTED MONITORS ---
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens
