@@ -4,7 +4,7 @@ local mainMod = "SUPER"
 
 
 -- Screenshot.
-hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("qs ipc call screenshot saveAndCopy"))
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("qs ipc call screenshot selectAndCopy"))
 
 -- Applications.
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
