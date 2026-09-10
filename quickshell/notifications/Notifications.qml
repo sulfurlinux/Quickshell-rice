@@ -7,6 +7,7 @@ PanelWindow {
     id: root
 
     property var theme
+    property int notificationTimeout: 5000
 
     screen: Quickshell.screens.primary
 
@@ -59,8 +60,8 @@ PanelWindow {
                 border.color: root.theme ? root.theme.accent : "#cba6f7"
 
                 Timer {
-                    interval: Math.max(1000, modelData.expireTimeout * 1000)
-                    running: modelData.expireTimeout > 0
+                    interval: root.notificationTimeout
+                    running: true
                     repeat: false
                     onTriggered: modelData.expire()
                 }
