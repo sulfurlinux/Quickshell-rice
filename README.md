@@ -14,7 +14,10 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - [ ] Add Screenshot Utility
 - [ ] Fancy Text cursor in the Terminal
 - [x] Logout menu
-- [x] Launcher
+- [ ] Launcher
+  - [x] App Launcher
+  - [ ] pkiller
+  - [ ] System settings
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [ ] Dynamic theme system
