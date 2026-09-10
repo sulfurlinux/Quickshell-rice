@@ -86,16 +86,25 @@ PanelWindow {
                             elide: Text.ElideRight
                         }
 
-                        Text {
-                            text: "×"
-                            color: root.theme ? root.theme.text : "#cdd6f4"
-                            font.pixelSize: 18
+                        Rectangle {
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
+                            color: "transparent"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "×"
+                                color: root.theme ? root.theme.text : "#cdd6f4"
+                                font.pixelSize: 18
+                            }
 
                             MouseArea {
                                 anchors.fill: parent
-                                anchors.margins: -6
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: modelData.dismiss()
+                                onClicked: mouse => {
+                                    mouse.accepted = true
+                                    modelData.dismiss()
+                                }
                             }
                         }
                     }
@@ -125,7 +134,10 @@ PanelWindow {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
-                    onClicked: modelData.dismiss()
+                    z: -1
+                    onClicked: modelData.actions.length > 0
+                        ? modelData.actions[0].invoke()
+                        : undefined
                 }
             }
         }

@@ -15,6 +15,7 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("pkill qs; sleep 0.2; qs &"))
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
 
 -- Focus navigation.
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
