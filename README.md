@@ -7,7 +7,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - Lockscreen keeps breaking > Maybe the pyton script breaks it?
 - Fix the Workspace order
 - Fix the scratchpad numbers
-- Fix the notification daemon blocking interaction with Notifications
+- Freeze the screen when Screenshotting
 
 ## Roadmap
 
