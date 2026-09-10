@@ -85,6 +85,10 @@ if os.path.exists(path):
         function copyFull(): void {
             screenshotTool.fullScreenClipboard()
         }
+
+        function selectAndCopy(): void {
+            screenshotTool.selectAreaSaveAndCopy()
+        }
     }
 
     Notifications {
