@@ -9,6 +9,7 @@ PanelWindow {
 
     property var theme
     property var launcher
+    property var screenshot
 
     property string currentTime: "--:--"
     property string sinkVolume: "0%"
@@ -28,7 +29,6 @@ PanelWindow {
     implicitHeight: 40
     color: theme ? theme.background : "#1e1e2e"
 
-    // Clock
     Process {
         id: timeProcess
         command: ["date", "+%H:%M"]
@@ -45,7 +45,6 @@ PanelWindow {
         onTriggered: timeProcess.running = true
     }
 
-    // Audio sink, volume and mute status of the speaker
     Process {
         id: sinkProcess
         command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
@@ -62,7 +61,6 @@ PanelWindow {
         }
     }
 
-    // Audio source, volume and mute status of the microphone
     Process {
         id: sourceProcess
         command: ["wpctl", "get-volume", "@DEFAULT_SOURCE@"]
@@ -120,7 +118,6 @@ PanelWindow {
             anchors.bottomMargin: 6
             spacing: 12
 
-            // Workspaces (left)
             Row {
                 spacing: 6
                 Layout.alignment: Qt.AlignLeft
@@ -160,10 +157,8 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            // Clock (center)
             Text {
                 anchors.centerIn: parent
-
                 text: root.currentTime
                 color: theme ? theme.text : "#cdd6f4"
                 font.pixelSize: 15
@@ -174,12 +169,36 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
-            // Audio (right)
             RowLayout {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
 
-                // Microphone
+                Rectangle {
+                    height: 28
+                    width: 52
+                    radius: 6
+                    color: theme ? theme.surface : "#313244"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "SHOT"
+                        color: theme ? theme.text : "#cdd6f4"
+                        font.pixelSize: 11
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.screenshot ? root.screenshot.selectArea() : undefined
+                        onPressed: mouse => {
+                            if (mouse.button === Qt.RightButton && root.screenshot)
+                                root.screenshot.fullScreen()
+                            else if (mouse.button === Qt.MiddleButton && root.screenshot)
+                                root.screenshot.selectAreaClipboard()
+                        }
+                    }
+                }
+
                 Rectangle {
                     height: 28
                     implicitWidth: micRow.implicitWidth + 12
@@ -226,7 +245,6 @@ PanelWindow {
                     }
                 }
 
-                // Speaker
                 Rectangle {
                     height: 28
                     implicitWidth: sinkRow.implicitWidth + 12
