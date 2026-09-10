@@ -1,37 +1,33 @@
-pragma Singleton
-
 import QtQuick
 import Quickshell
 import Quickshell.Io
 
-Singleton {
-    id: screenshot
+QtObject {
+    id: root
 
-    property string screenshotDir: StandardPaths.writableLocation(StandardPaths.PicturesLocation) + "/Screenshots"
-
-    function ensureDir() {
-        Quickshell.execDetached(["mkdir", "-p", screenshotDir])
-    }
+    readonly property string screenshotDir: Quickshell.env("HOME") + "/Pictures/Screenshots"
 
     function timestamp() {
         return Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss")
     }
 
+    function run(command) {
+        Quickshell.execDetached(command)
+    }
+
     function fullScreen() {
-        ensureDir()
-        Quickshell.execDetached(["sh", "-c", "grim -t png '" + screenshotDir + "/Screenshot_" + timestamp() + ".png'"])
+        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && grim \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\""])
     }
 
     function selectArea() {
-        ensureDir()
-        Quickshell.execDetached(["sh", "-c", "grim -g \"$(slurp)\" -t png '" + screenshotDir + "/Screenshot_" + timestamp() + ".png'"])
+        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\""])
     }
 
     function fullScreenClipboard() {
-        Quickshell.execDetached(["sh", "-c", "grim - | wl-copy --type image/png"])
+        run(["sh", "-c", "grim - | wl-copy --type image/png"])
     }
 
     function selectAreaClipboard() {
-        Quickshell.execDetached(["sh", "-c", "grim -g \"$(slurp)\" - | wl-copy --type image/png"])
+        run(["sh", "-c", "geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" - | wl-copy --type image/png"])
     }
 }
