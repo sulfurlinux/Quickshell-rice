@@ -50,6 +50,10 @@ if os.path.exists(path):
         }
     }
 
+    Screenshot {
+        id: screenshotTool
+    }
+
     Launcher {
         id: globalLauncher
         theme: root.currentTheme
@@ -60,6 +64,30 @@ if os.path.exists(path):
 
         function toggle(): void {
             globalLauncher.visible = !globalLauncher.visible
+        }
+    }
+
+    IpcHandler {
+        target: "screenshot"
+
+        function select(): void {
+            screenshotTool.selectArea()
+        }
+
+        function full(): void {
+            screenshotTool.fullScreen()
+        }
+
+        function copy(): void {
+            screenshotTool.selectAreaClipboard()
+        }
+
+        function copyFull(): void {
+            screenshotTool.fullScreenClipboard()
+        }
+
+        function selectAndCopy(): void {
+            screenshotTool.selectAreaSaveAndCopy()
         }
     }
 
@@ -92,6 +120,7 @@ if os.path.exists(path):
                 screen: modelData
                 theme: root.currentTheme
                 launcher: globalLauncher
+                screenshot: screenshotTool
             }
         }
     }
