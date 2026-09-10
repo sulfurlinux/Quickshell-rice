@@ -2,6 +2,6 @@
 return {
     browser = "firefox",
     terminal = "ghostty",
-    fileManager = "dolphin",
+    fileManager = "nautilus",
     menu = "quickshell ipc call launcher toggle",
 }
