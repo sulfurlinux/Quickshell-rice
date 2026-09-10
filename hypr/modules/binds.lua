@@ -2,6 +2,10 @@
 local programs = require("modules.programs")
 local mainMod = "SUPER"
 
+
+-- Screenshot.
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("qs ipc call screenshot saveAndCopy"))
+
 -- Applications.
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
