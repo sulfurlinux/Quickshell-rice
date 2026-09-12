@@ -8,6 +8,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - Fix the Workspace order
 - Fix the scratchpad numbers
 - Freeze the screen when Screenshotting
+- Fix the screenshot utility white background stacking
 
 ## Roadmap
 
