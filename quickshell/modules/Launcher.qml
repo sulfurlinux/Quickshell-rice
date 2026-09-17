@@ -29,7 +29,7 @@ PanelWindow {
     property var systemCommands: [
         { name: "/shutdown", exec: "systemctl poweroff", desc: "Shut down the PC" },
         { name: "/reboot", exec: "systemctl reboot", desc: "Restart the system" },
-//      { name: "/lock", exec: "hyprlock", desc: "Lock the screen" },
+        { name: "/lock", exec: "hyprlock", desc: "Lock the screen" },
         { name: "/logout", exec: "loginctl terminate-user $USER", desc: "Log out of the session" },
         { name: "/wallpaper", exec: "list_wallpapers", desc: "Select a wallpaper" }
     ]

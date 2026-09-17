@@ -4,6 +4,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Todo
 
+### - Seems to Work again?
 - Lockscreen keeps breaking > Maybe the pyton script breaks it?
   - Write the Wallpaper into a separate file and read from there instead of writing into the config, implement a Fallback 
 - Fix the Workspace order
