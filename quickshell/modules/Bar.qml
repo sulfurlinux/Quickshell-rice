@@ -157,14 +157,7 @@ PanelWindow {
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: {
-                                let name = modelData.name || ""
-
-                                if (name.startsWith("special:"))
-                                    Hyprland.dispatch("workspace " + name)
-                                else
-                                    Hyprland.dispatch("workspace " + modelData.id)
-                            }
+                            onClicked: modelData.activate()
                         }
                     }
                 }
