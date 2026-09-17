@@ -1,19 +1,16 @@
-# Schema für automatische Editor-Vervollständigung
+# Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Fügt eine leere Zeile vor jedem neuen Befehl ein (für bessere Lesbarkeit)
 add_newline = true
 
-# Das Eingabezeichen am Anfang (z.B. ein schlichtes '>' oder '->')
 [character]
 success_symbol = '[>](bold green)'
 error_symbol = '[>](bold red)'
 
-# Beispiel: Das Verzeichnis-Modul etwas schlichter halten
 [directory]
 truncation_length = 3
 truncate_to_repo = true
 
-# Falls du bestimmte Module komplett ausschalten willst (z.B. Paket-Versionen etc.):
+# Disable the package module, hiding it from the prompt completely
 [package]
 disabled = true
