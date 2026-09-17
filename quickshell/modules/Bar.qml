@@ -128,7 +128,7 @@ PanelWindow {
                     Rectangle {
                         required property var modelData
 
-                        width: 28
+                        width: Math.max(28, workspaceLabel.implicitWidth + 16)
                         height: 28
                         radius: 6
 
@@ -137,8 +137,18 @@ PanelWindow {
                             : (theme ? theme.surface : "#313244")
 
                         Text {
+                            id: workspaceLabel
                             anchors.centerIn: parent
-                            text: modelData.id
+                            text: {
+                                let name = modelData.name || ""
+
+                                if (name.startsWith("special:")) {
+                                    let scratchpadName = name.slice(8)
+                                    return scratchpadName.charAt(0).toUpperCase() + scratchpadName.slice(1)
+                                }
+
+                                return modelData.id
+                            }
                             color: modelData.active
                                 ? (theme ? theme.background : "#1e1e2e")
                                 : (theme ? theme.text : "#cdd6f4")
@@ -147,7 +157,7 @@ PanelWindow {
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: Hyprland.dispatch("workspace " + modelData.id)
+                            onClicked: modelData.activate()
                         }
                     }
                 }
