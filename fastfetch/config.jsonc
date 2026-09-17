@@ -9,8 +9,9 @@
     "cpu",
     {
       "type": "gpu",
+      // Hier kannst du steuern, was genau angezeigt wird:
       "key": "GPU",
-      "format": "GeForce RTX 3060 Ti"
+      "format": "GeForce RTX 3060 Ti" // Zeigt meist den reinen Namen der GPU an
     },
     "datetime",
     "break",
