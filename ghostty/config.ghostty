@@ -1,3 +1,5 @@
 font-family = "JetBrainsMono Nerd Font"
 font-size = 12
 theme = Catppuccin Mocha
+
+custom-shader = shaders/boo-cursor.glsl
