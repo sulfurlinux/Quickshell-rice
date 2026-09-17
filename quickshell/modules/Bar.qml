@@ -213,8 +213,8 @@ PanelWindow {
                         spacing: 4
 
                         Text {
-                            text: root.sourceMuted ? "M" : "MIC"
-                            font.pixelSize: 11
+                            text: root.sourceMuted ? "󰍮" : "󰍬"
+                            font.pixelSize: 16
                             font.bold: true
                             color: theme ? theme.text : "#cdd6f4"
                         }
@@ -259,8 +259,8 @@ PanelWindow {
                         spacing: 4
 
                         Text {
-                            text: root.sinkMuted ? "M" : "VOL"
-                            font.pixelSize: 11
+                            text: root.sinkMuted ? "" : ""
+                            font.pixelSize: 16
                             font.bold: true
                             color: theme ? theme.text : "#cdd6f4"
                         }
