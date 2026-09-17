@@ -1,6 +1,6 @@
 -- Main Hyprland configuration
 
-require("modules.scratchpads")
+--require("modules.scratchpads")
 require("modules.monitors")
 require("modules.programs")
 require("modules.autostart")

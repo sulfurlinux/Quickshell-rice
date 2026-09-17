@@ -40,10 +40,34 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
-hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
+
+-- Scratchpad window rules and keybindings.
+
+hl.window_rule({
+    match = { class = "spotify" },
+    workspace = "special:spotify"
+})
+
+hl.bind(mainMod.. "+ M", hl.dsp.workspace.toggle_special("spotify"))
+hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "special:spotify" }))
+hl.bind(mainMod .. "+ M", hl.dsp.exec_cmd("spotify"))
+
+
+hl.window_rule({
+    match = { class = "discord" },
+    workspace = "special:discord"
+})
+
+hl.bind(mainMod.. "+ D", hl.dsp.workspace.toggle_special("discord"))
+hl.bind(mainMod .. " + SHIFT + D", hl.dsp.window.move({ workspace = "special:discord" }))
+hl.bind(mainMod.. "+ D", hl.dsp.exec_cmd("discord"))
+
+
+hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+
 
 -- Mouse actions.
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
