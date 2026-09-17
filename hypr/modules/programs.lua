@@ -3,7 +3,7 @@
 return {
     browser = "firefox",
     terminal = "ghostty",
-    fileManager = "nautilus",
+    fileManager = "nautilus -w",
     editor = "zeditor",
     menu = "quickshell ipc call launcher toggle",
 }
