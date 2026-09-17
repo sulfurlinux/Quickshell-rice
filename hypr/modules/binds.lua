@@ -2,7 +2,6 @@
 local programs = require("modules.programs")
 local mainMod = "SUPER"
 
-
 -- Screenshot.
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call screenshot selectAndCopy"))
 
@@ -11,13 +10,14 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(programs.menu))
+hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd(programs.editor))
 
 -- Window management.
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + G", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("pkill qs; sleep 0.2; qs &"))
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
 
@@ -26,6 +26,12 @@ hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down", hl.dsp.focus({ direction = "down" }))
+
+-- Window navigation.
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
 
 -- Workspace navigation.
 for i = 1, 10 do
