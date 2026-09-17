@@ -238,6 +238,7 @@ Scope {
             color: root.theme ? root.theme.background : "#1e1e2e"
             border.width: 1
             border.color: root.theme ? root.theme.accent : "#cba6f7"
+            focus: root.centerVisible
 
             Keys.onEscapePressed: root.centerVisible = false
 
