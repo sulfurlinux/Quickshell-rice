@@ -213,7 +213,7 @@ PanelWindow {
                         spacing: 4
 
                         Text {
-                            text: root.sourceMuted ? "󰍮" : "󰍬"
+                            text: root.sourceMuted ? "" : ""
                             font.pixelSize: 16
                             font.bold: true
                             color: theme ? theme.text : "#cdd6f4"
