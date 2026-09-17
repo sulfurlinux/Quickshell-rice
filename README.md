@@ -26,6 +26,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
   - [x] App Launcher
   - [ ] pkiller
   - [ ] System settings
+  - [ ] Transparency
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [ ] Dynamic theme system
