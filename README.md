@@ -8,7 +8,6 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
   - Lockscreen keeps breaking > Maybe the pyton script breaks it?
     - Write the Wallpaper into a separate file and read from there instead of writing into the config, implement a Fallback  
 - Fix the Workspace order
-- Fix the scratchpad numbers
 - Freeze the screen when Screenshotting
 - Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
@@ -44,6 +43,6 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - [ ] Customize lockscreen / login screen
 - [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
-- [ ] Notification System
+- [x] Notification System
   - [x] Notification daemon
-  - [ ] Notification center
+  - [x] Notification center
