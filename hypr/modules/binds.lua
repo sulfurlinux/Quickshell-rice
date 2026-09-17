@@ -5,6 +5,9 @@ local mainMod = "SUPER"
 -- Screenshot.
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call screenshot selectAndCopy"))
 
+-- Notification center.
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))
+
 -- Applications.
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))

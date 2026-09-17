@@ -58,11 +58,28 @@ if os.path.exists(path):
         theme: root.currentTheme
     }
 
+    Notifications {
+        id: notificationCenter
+        theme: root.currentTheme
+    }
+
     IpcHandler {
         target: "launcher"
 
         function toggle(): void {
             globalLauncher.visible = !globalLauncher.visible
+        }
+    }
+
+    IpcHandler {
+        target: "notifications"
+
+        function toggle(): void {
+            notificationCenter.centerVisible = !notificationCenter.centerVisible
+        }
+
+        function close(): void {
+            notificationCenter.centerVisible = false
         }
     }
 
@@ -88,10 +105,6 @@ if os.path.exists(path):
         function selectAndCopy(): void {
             screenshotTool.selectAreaSaveAndCopy()
         }
-    }
-
-    Notifications {
-        theme: root.currentTheme
     }
 
     Variants {
