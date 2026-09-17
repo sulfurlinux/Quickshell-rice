@@ -327,10 +327,9 @@ Scope {
                             border.width: 1
                             border.color: root.theme ? root.theme.overlay : "#45475a"
 
-                            MouseArea {
-                                anchors.fill: parent
+                            TapHandler {
                                 acceptedButtons: Qt.LeftButton
-                                onClicked: {
+                                onTapped: {
                                     if (modelData.actions.length > 0) {
                                         modelData.actions[0].invoke()
                                     }
