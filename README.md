@@ -11,6 +11,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 - Freeze the screen when Screenshotting
 - Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
+- Sort the files from Quickshell
 
 ## Roadmap
 
