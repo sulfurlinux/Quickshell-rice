@@ -128,7 +128,7 @@ PanelWindow {
                     Rectangle {
                         required property var modelData
 
-                        width: workspaceLabel.implicitWidth + 16
+                        width: Math.max(28, workspaceLabel.implicitWidth + 16)
                         height: 28
                         radius: 6
 
@@ -157,7 +157,14 @@ PanelWindow {
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: Hyprland.dispatch("workspace " + modelData.name)
+                            onClicked: {
+                                let name = modelData.name || ""
+
+                                if (name.startsWith("special:"))
+                                    Hyprland.dispatch("workspace " + name)
+                                else
+                                    Hyprland.dispatch("workspace " + modelData.id)
+                            }
                         }
                     }
                 }
