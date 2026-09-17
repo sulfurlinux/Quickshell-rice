@@ -260,14 +260,48 @@ Scope {
                         Layout.fillWidth: true
                     }
 
-                    Button {
-                        text: "Clear all"
-                        onClicked: root.clearHistory()
+                    Rectangle {
+                        implicitWidth: clearText.implicitWidth + 20
+                        height: 28
+                        radius: 6
+                        color: root.theme ? root.theme.surface : "#313244"
+
+                        Text {
+                            id: clearText
+                            anchors.centerIn: parent
+                            text: "Clear all"
+                            color: root.theme ? root.theme.text : "#cdd6f4"
+                            font.pixelSize: 11
+                            font.bold: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.clearHistory()
+                        }
                     }
 
-                    Button {
-                        text: "Close"
-                        onClicked: root.centerVisible = false
+                    Rectangle {
+                        implicitWidth: closeText.implicitWidth + 20
+                        height: 28
+                        radius: 6
+                        color: root.theme ? root.theme.surface : "#313244"
+
+                        Text {
+                            id: closeText
+                            anchors.centerIn: parent
+                            text: "Close"
+                            color: root.theme ? root.theme.text : "#cdd6f4"
+                            font.pixelSize: 11
+                            font.bold: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.centerVisible = false
+                        }
                     }
                 }
 
@@ -332,9 +366,25 @@ Scope {
                                         elide: Text.ElideRight
                                     }
 
-                                    Button {
-                                        text: "×"
-                                        onClicked: root.removeFromHistory(modelData)
+                                    Rectangle {
+                                        width: 28
+                                        height: 28
+                                        radius: 6
+                                        color: root.theme ? root.theme.surface : "#313244"
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "×"
+                                            color: root.theme ? root.theme.text : "#cdd6f4"
+                                            font.pixelSize: 16
+                                            font.bold: true
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.removeFromHistory(modelData)
+                                        }
                                     }
                                 }
 
