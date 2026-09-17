@@ -17,6 +17,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 - [x] Add Screenshot Utility
 - [ ] beautify ls
+- [ ] Find a good filemanager
 - [ ] Clipboard
 - [ ] Cursor
 - [x] Fancy Text cursor in the Terminal
