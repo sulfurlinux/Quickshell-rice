@@ -14,8 +14,6 @@ Scope {
     property var historyLocks: []
     readonly property int historyLimit: 100
 
-    screen: Quickshell.screens.primary
-
     Component {
         id: lockComponent
 
@@ -258,147 +256,118 @@ Scope {
                         font.bold: true
                     }
 
-                    Item { Layout.fillWidth: true }
-
-                    Text {
-                        text: root.history.length > 0
-                            ? root.history.length + " stored"
-                            : "No notifications"
-                        color: root.theme ? root.theme.subtext : "#a6adc8"
-                        font.pixelSize: 12
+                    Item {
+                        Layout.fillWidth: true
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 80
-                        Layout.preferredHeight: 30
-                        radius: 8
-                        color: root.theme ? root.theme.surface : "#313244"
-                        visible: root.history.length > 0
+                    Button {
+                        text: "Clear all"
+                        onClicked: root.clearHistory()
+                    }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "Clear all"
-                            color: root.theme ? root.theme.text : "#cdd6f4"
-                            font.pixelSize: 12
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.clearHistory()
-                        }
+                    Button {
+                        text: "Close"
+                        onClicked: root.centerVisible = false
                     }
                 }
 
-                ListView {
-                    id: historyView
-
+                ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     clip: true
-                    spacing: 8
-                    model: ScriptModel {
-                        values: root.history
-                        objectProp: "id"
-                    }
 
-                    delegate: Rectangle {
-                        required property var modelData
+                    ListView {
+                        id: historyList
 
-                        width: historyView.width
-                        implicitHeight: historyContent.implicitHeight + 24
-                        radius: 10
-                        color: root.theme ? root.theme.surface : "#313244"
-                        border.width: 1
-                        border.color: root.theme ? root.theme.accent : "#cba6f7"
+                        model: root.history
+                        spacing: 8
 
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.LeftButton
-                            onClicked: {
-                                if (modelData.tracked && modelData.actions.length > 0) {
-                                    modelData.actions[0].invoke()
+                        delegate: Rectangle {
+                            required property var modelData
+
+                            width: historyList.width
+                            implicitHeight: historyContent.implicitHeight + 24
+                            radius: 10
+                            color: root.theme ? root.theme.surface : "#313244"
+                            border.width: 1
+                            border.color: root.theme ? root.theme.overlay : "#45475a"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton
+                                onClicked: {
+                                    if (modelData.actions.length > 0) {
+                                        modelData.actions[0].invoke()
+                                    }
                                 }
                             }
-                        }
 
-                        ColumnLayout {
-                            id: historyContent
+                            ColumnLayout {
+                                id: historyContent
 
-                            anchors.fill: parent
-                            anchors.margins: 12
-                            spacing: 5
+                                anchors.fill: parent
+                                anchors.margins: 12
+                                spacing: 4
 
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 8
 
-                                Image {
-                                    Layout.preferredWidth: 28
-                                    Layout.preferredHeight: 28
-                                    source: modelData.appIcon
-                                        ? Quickshell.iconPath(modelData.appIcon, "application-x-executable")
-                                        : ""
-                                    visible: source.length > 0
-                                    fillMode: Image.PreserveAspectFit
+                                    Image {
+                                        Layout.preferredWidth: 24
+                                        Layout.preferredHeight: 24
+                                        source: modelData.appIcon
+                                            ? Quickshell.iconPath(modelData.appIcon, "application-x-executable")
+                                            : ""
+                                        visible: source.length > 0
+                                        fillMode: Image.PreserveAspectFit
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: modelData.appName
+                                        color: root.theme ? root.theme.subtext : "#a6adc8"
+                                        font.pixelSize: 12
+                                        font.bold: true
+                                        elide: Text.ElideRight
+                                    }
+
+                                    Button {
+                                        text: "×"
+                                        onClicked: root.removeFromHistory(modelData)
+                                    }
                                 }
 
                                 Text {
                                     Layout.fillWidth: true
-                                    text: modelData.appName
-                                    color: root.theme ? root.theme.subtext : "#a6adc8"
-                                    font.pixelSize: 12
+                                    text: modelData.summary
+                                    color: root.theme ? root.theme.text : "#cdd6f4"
+                                    font.pixelSize: 14
                                     font.bold: true
-                                    elide: Text.ElideRight
+                                    wrapMode: Text.Wrap
                                 }
 
                                 Text {
-                                    text: modelData.tracked ? "Active" : ""
-                                    color: root.theme ? root.theme.accent : "#cba6f7"
-                                    font.pixelSize: 11
+                                    Layout.fillWidth: true
+                                    visible: text.length > 0
+                                    text: modelData.body
+                                    color: root.theme ? root.theme.text : "#cdd6f4"
+                                    font.pixelSize: 13
+                                    wrapMode: Text.Wrap
+                                    textFormat: Text.PlainText
                                 }
-
-                                Rectangle {
-                                    Layout.preferredWidth: 24
-                                    Layout.preferredHeight: 24
-                                    color: "transparent"
-                                    z: 2
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "×"
-                                        color: root.theme ? root.theme.text : "#cdd6f4"
-                                        font.pixelSize: 18
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.removeFromHistory(modelData)
-                                    }
-                                }
-                            }
-
-                            Text {
-                                Layout.fillWidth: true
-                                text: modelData.summary
-                                color: root.theme ? root.theme.text : "#cdd6f4"
-                                font.pixelSize: 15
-                                font.bold: true
-                                wrapMode: Text.Wrap
-                            }
-
-                            Text {
-                                Layout.fillWidth: true
-                                visible: text.length > 0
-                                text: modelData.body
-                                color: root.theme ? root.theme.text : "#cdd6f4"
-                                font.pixelSize: 13
-                                wrapMode: Text.Wrap
-                                textFormat: Text.PlainText
                             }
                         }
                     }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    visible: root.history.length === 0
+                    text: "No notifications"
+                    horizontalAlignment: Text.AlignHCenter
+                    color: root.theme ? root.theme.subtext : "#a6adc8"
+                    font.pixelSize: 14
                 }
             }
         }
