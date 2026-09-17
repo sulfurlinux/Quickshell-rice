@@ -1,9 +1,8 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import "."
-import "./bars"
-import "./notifications"
+import "./modules/"
+import "./modules/notifications"
 
 Scope {
     id: root
