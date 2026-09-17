@@ -33,6 +33,24 @@ hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" 
 hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
 
+-- Window resizing.
+hl.bind(mainMod .. " + CTRL + left", function()
+    hl.dispatch(hl.dsp.window.resize({ x = -10, y = 0, relative = true }))
+end, { repeating = true })
+
+hl.bind(mainMod .. " + CTRL + right", function()
+    hl.dispatch(hl.dsp.window.resize({ x = 10, y = 0, relative = true }))
+end, { repeating = true })
+
+hl.bind(mainMod .. " + CTRL + up", function()
+    hl.dispatch(hl.dsp.window.resize({ x = 0, y = -10, relative = true }))
+end, { repeating = true })
+
+hl.bind(mainMod .. " + CTRL + down", function()
+    hl.dispatch(hl.dsp.window.resize({ x = 0, y = 10, relative = true }))
+end, { repeating = true })
+
+
 -- Workspace navigation.
 for i = 1, 10 do
     local key = i % 10
