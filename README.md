@@ -30,6 +30,7 @@ And move the files into your .config directory
 ```
 cd Quickshell-rice
 cp * $USER/.config/
+rm .gitignore .lunarc.json README.md
 cd ..
 ```
 
