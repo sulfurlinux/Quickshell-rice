@@ -107,19 +107,21 @@ Scope {
 
                 delegate: Rectangle {
                     required property var modelData
+                    property bool popupVisible: true
 
                     Layout.fillWidth: true
-                    implicitHeight: popupContent.implicitHeight + 24
+                    implicitHeight: popupVisible ? popupContent.implicitHeight + 24 : 0
                     radius: 10
                     color: root.theme ? root.theme.surface : "#313244"
                     border.width: 1
                     border.color: root.theme ? root.theme.accent : "#cba6f7"
+                    visible: popupVisible
 
                     Timer {
                         interval: root.notificationTimeout
                         running: true
                         repeat: false
-                        onTriggered: modelData.expire()
+                        onTriggered: popupVisible = false
                     }
 
                     MouseArea {
