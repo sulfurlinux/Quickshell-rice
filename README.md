@@ -8,9 +8,10 @@ A personal Linux rice using Arch, Hyprland and Quickshell.
 - Fix the Launcher buging when the cursor is inside the window
 
 ## Install
-1. Make sure you got Quickshell, Ghostty, Fish, Ly and Hyprlock installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
+1. Make sure you got Quickshell, Ghostty, Fish, Ly, Hyprlock and the Hyprcursor Theme installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
 ```
 sudo pacman -S quickshell ghostty hyprlock ly fish
+yay -S rose-pine-hyprcursor
 ```
 2. Clone the repository
 ```
