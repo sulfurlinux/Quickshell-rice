@@ -13,10 +13,10 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Install
 
-1. Make sure you got Quickshell, Ghostty, Ly and Hyprlock installed.
+1. Make sure you got Quickshell, Ghostty, Fish, Ly and Hyprlock installed.
 
 ```
-sudo pacman -S quickshell ghostty hyprlock ly
+sudo pacman -S quickshell ghostty hyprlock ly fish
 ```
 
 2. Clone the repository
