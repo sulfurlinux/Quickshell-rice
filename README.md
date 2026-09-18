@@ -6,6 +6,7 @@ A personal Linux rice using Arch, Hyprland and Quickshell.
 - Freeze the screen when Screenshotting
 - Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
+- Make the window padding smaller
 
 ## Install
 1. Make sure you got Quickshell, Ghostty, Fish, Ly and Hyprlock installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
