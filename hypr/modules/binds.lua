@@ -66,28 +66,16 @@ hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
 -- Scratchpad window rules and keybindings.
 
-hl.window_rule({
-    match = { class = "spotify" },
-    workspace = "special:spotify"
-})
-
-hl.bind(mainMod.. "+ M", hl.dsp.workspace.toggle_special("spotify"))
-hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "special:spotify" }))
+hl.bind(mainMod.. "+ M", hl.dsp.workspace.toggle_special(""))
+hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "special:" }))
 hl.bind(mainMod .. "+ M", hl.dsp.exec_cmd("spotify"))
 
-
-hl.window_rule({
-    match = { class = "discord" },
-    workspace = "special:discord"
-})
-
-hl.bind(mainMod.. "+ D", hl.dsp.workspace.toggle_special("discord"))
-hl.bind(mainMod .. " + SHIFT + D", hl.dsp.window.move({ workspace = "special:discord" }))
+hl.bind(mainMod.. "+ D", hl.dsp.workspace.toggle_special(""))
+hl.bind(mainMod .. " + SHIFT + D", hl.dsp.window.move({ workspace = "special:" }))
 hl.bind(mainMod.. "+ D", hl.dsp.exec_cmd("discord"))
 
-
-hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special(""))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:" }))
 
 
 -- Mouse actions.
@@ -95,6 +83,9 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Audio and brightness controls.
+
+hl.bind(mainMod .. " + tab", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true })
+
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
