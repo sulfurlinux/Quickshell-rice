@@ -14,7 +14,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 ## Install
 
 ```
-
+git clone --bare --depth 1 https://github.com/sulfurlinux/Quickshell-Rice.git
 ```
 
 ## Roadmap
