@@ -152,6 +152,7 @@ PanelWindow {
                             color: modelData.active
                                 ? (theme ? theme.background : "#1e1e2e")
                                 : (theme ? theme.text : "#cdd6f4")
+                            font.pixelSize: 13
                             font.bold: true
                         }
 
@@ -182,34 +183,6 @@ PanelWindow {
             RowLayout {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
-
-                /*
-                Rectangle {
-                    height: 28
-                    width: 52
-                    radius: 6
-                    color: theme ? theme.surface : "#313244"
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "SHOT"
-                        color: theme ? theme.text : "#cdd6f4"
-                        font.pixelSize: 11
-                        font.bold: true
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.screenshot ? root.screenshot.selectArea() : undefined
-                        onPressed: mouse => {
-                            if (mouse.button === Qt.RightButton && root.screenshot)
-                                root.screenshot.fullScreen()
-                            else if (mouse.button === Qt.MiddleButton && root.screenshot)
-                                root.screenshot.selectAreaClipboard()
-                        }
-                    }
-                }
-                */
 
                 Rectangle {
                     height: 28
