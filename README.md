@@ -13,8 +13,30 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Install
 
+Make sure you got Quickshell, Ghostty and Hyprlock installed.
+
+```
+sudo pacman -S quickshell ghostty hyprlock
+```
+
+Clone the repository
+
 ```
 git clone --bare --depth 1 https://github.com/sulfurlinux/Quickshell-rice.git
+```
+
+And move the files into your .config directory
+
+```
+cd Quickshell-rice
+cp * $USER/.config/
+cd ..
+```
+
+Don't forget to delete the left over clone
+
+```
+rm -rf Quickshell-rice
 ```
 
 ## Roadmap
