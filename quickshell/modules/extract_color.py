@@ -78,18 +78,13 @@ def main():
         file.write("$background = rgb(1e1e2e)\n")
         file.write("$text = rgb(cdd6f4)\n")
 
-    # Keep the background path in the actual hyprlock configuration in sync.
-    hyprlock_main_conf = os.path.expanduser("~/.config/hypr/hyprlock.conf")
-    if os.path.exists(hyprlock_main_conf):
-        with open(hyprlock_main_conf, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-
-        with open(hyprlock_main_conf, "w", encoding="utf-8") as file:
-            for line in lines:
-                if line.strip().startswith("path ="):
-                    file.write(f"    path = {clean_path}\n")
-                else:
-                    file.write(line)
+    # Keep the wallpaper path separate from hyprlock.conf.
+    # Write it atomically so hyprlock never sees a partially written file.
+    wallpaper_conf = os.path.join(cache_dir, "hyprlock_wallpaper.conf")
+    wallpaper_tmp = f"{wallpaper_conf}.tmp"
+    with open(wallpaper_tmp, "w", encoding="utf-8") as file:
+        file.write(f"$wallpaper = {clean_path}\n")
+    os.replace(wallpaper_tmp, wallpaper_conf)
 
     return 0
 
