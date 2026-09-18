@@ -22,15 +22,15 @@ sudo pacman -S quickshell ghostty hyprlock ly fish
 2. Clone the repository
 
 ```
-git clone --bare --depth 1 https://github.com/sulfurlinux/Quickshell-rice.git
+git clone https://github.com/sulfurlinux/Quickshell-rice.git
 ```
 
 3. And move the files into your .config directory
 
 ```
 cd Quickshell-rice
-cp * $USER/.config/
-rm .gitignore .lunarc.json README.md
+cp -r * /home/$USER/.config/
+rm -rf .gitignore .lunarc.json README.md
 cd ..
 ```
 
