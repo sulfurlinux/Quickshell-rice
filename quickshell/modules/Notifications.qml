@@ -4,8 +4,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
 
-//test
-
 Scope {
     id: root
 
