@@ -42,7 +42,7 @@ rm -rf Quickshell-rice
 5. Reload
 
 ```
-hopefully reload
+hyprctl reload
 ```
 ## Roadmap
 
