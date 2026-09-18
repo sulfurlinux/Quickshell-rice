@@ -73,6 +73,7 @@ hyprctl reload
   - [ ] System resource usage
   - [x] Clock
 - [ ] Customize lockscreen / login screen
+- [ ] Customize Boot animation / limine 
 - [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
 - [x] Notification System
