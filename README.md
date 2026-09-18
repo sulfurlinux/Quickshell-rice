@@ -35,7 +35,7 @@ hyprctl reload
 ## Roadmap
 - [x] Add Screenshot Utility
 - [ ] Clipboard
-- [ ] Cursor
+- [x] Cursor
 - [x] Fancy Text cursor in the Terminal
 - [x] Logout menu
 - [ ] Launcher
