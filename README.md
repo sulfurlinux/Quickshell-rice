@@ -34,8 +34,6 @@ hyprctl reload
 
 ## Roadmap
 - [x] Add Screenshot Utility
-- [x] beautify ls
-- [ ] Find a good filemanager
 - [ ] Clipboard
 - [ ] Cursor
 - [x] Fancy Text cursor in the Terminal
@@ -43,8 +41,6 @@ hyprctl reload
 - [ ] Launcher
   - [x] App Launcher
   - [ ] pkiller
-  - [ ] System settings
-  - [ ] (Transparency)
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [ ] Dynamic theme system
