@@ -1,6 +1,6 @@
 # Quickshell-rice
 
-A personal Linux desktop rice built around Hyprland and Quickshell.
+A personal Linux desktop rice built around Arch, Hyprland and Quickshell.
 
 ## Todo
 
@@ -13,7 +13,7 @@ A personal Linux desktop rice built around Hyprland and Quickshell.
 
 ## Install
 
-1. Make sure you got Quickshell, Ghostty, Fish, Ly and Hyprlock installed.
+1. Make sure you got Quickshell, Ghostty, Fish, Ly and Hyprlock installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
 
 ```
 sudo pacman -S quickshell ghostty hyprlock ly fish
