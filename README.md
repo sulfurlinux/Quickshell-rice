@@ -2,6 +2,7 @@
 A personal Linux rice using Arch, Hyprland and Quickshell.
 
 ## Todo
+- Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
 - Freeze the screen when Screenshotting
 - Fix the screenshot utility white background stacking
