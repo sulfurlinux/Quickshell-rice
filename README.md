@@ -13,9 +13,6 @@ A personal Linux rice using Arch, Hyprland and Quickshell.
 
 ## Install
 1. Make sure you got the dependencies installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
-
-If encounter a prompt like this, you can simply press enter to continue.
-![alt text](Install.png)
 ```
 sudo pacman -S quickshell ghostty hyprlock ly fish fastfetch ttf-jetbrains-mono-nerd nautilus zed starship
 sudo pacman -S --needed git base-devel
@@ -26,6 +23,8 @@ cd ..
 rm -rf yay
 yay -S rose-pine-hyprcursor
 ```
+If encounter a prompt like this, you can simply press enter to continue.
+![alt text](Install.png)
 
 2. Clone the repository and move the needed files into your .config directory
 ```
