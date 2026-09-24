@@ -25,8 +25,8 @@ git clone https://github.com/sulfurlinux/Quickshell-rice.git
 3. And move the files into your .config directory
 ```
 cd Quickshell-rice
-cp -r * /home/$USER/.config/
 rm -rf .gitignore .lunarc.json README.md
+cp -r * /home/$USER/.config/
 cd ..
 ```
 4. Don't forget to delete the left over clone
