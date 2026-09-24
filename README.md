@@ -11,34 +11,56 @@ A personal Linux rice using Arch, Hyprland and Quickshell.
 - Fix the Launcher buging when the cursor is inside the window
 - make the louncher icons use the text color
 
-
 ## Install
-1. Make sure you got Quickshell, Ghostty, Fish, Ly, Hyprlock and the Hyprcursor Theme installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
+1. Make sure you got the dependencies installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
 ```
-sudo pacman -S quickshell ghostty hyprlock ly fish
+sudo pacman -S quickshell ghostty hyprlock ly fish fastfetch ttf-jetbrains-mono-nerd nautilus zed starship
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+cd ..
+rm -rf yay
 yay -S rose-pine-hyprcursor
 ```
-2. Clone the repository
+
+2. Clone the repository and move the needed files into your .config directory
 ```
 git clone https://github.com/sulfurlinux/Quickshell-rice.git
-```
-3. And move the files into your .config directory
-```
 cd Quickshell-rice
 rm -rf .gitignore .lunarc.json README.md
 cp -r * /home/$USER/.config/
 cd ..
-```
-4. Don't forget to delete the left over clone
-```
 rm -rf Quickshell-rice
 ```
-5. Reload
+
+3. Change the shell to fish
+```
+chsh -s /usr/bin/fish
+```
+
+4. Set the hyprcursor and gtk theme
+```
+hyprctl setcursor rose-pine-hyprcursor 28
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+```
+
+5. Setup the user folders if they don't exist yet (Executing the command if they do exist won't do anything and will not overwrite any existing files)
+```
+mkdir /home/$USER/Desktop
+mkdir /home/$USER/Documents
+mkdir /home/$USER/Downloads
+mkdir /home/$USER/Music
+mkdir /home/$USER/Pictures
+mkdir /home/$USER/Pictures/Wallpapers
+mkdir /home/$USER/Videos
+```
+
+6. Reload
 ```
 hyprctl reload
 ```
-
-- yay, fastfetch, Fonts, shell change, Starship, Wallpaper, User folders, Set Mouse theme, Install Nautilus, Darkmode theme
 
 ## Roadmap
 - [x] Add Screenshot Utility
