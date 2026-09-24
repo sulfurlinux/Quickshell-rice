@@ -2,12 +2,15 @@
 A personal Linux rice using Arch, Hyprland and Quickshell.
 
 ## Todo
-- Set the monitor refresh rate
+- Hyprctl kill
+- Add timestamps and a do not disturb to the notification center
 - Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
 - Freeze the screen when Screenshotting
 - Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
+- make the louncher icons use the text color
+
 
 ## Install
 1. Make sure you got Quickshell, Ghostty, Fish, Ly, Hyprlock and the Hyprcursor Theme installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
@@ -34,6 +37,8 @@ rm -rf Quickshell-rice
 ```
 hyprctl reload
 ```
+
+- yay, fastfetch, Fonts, shell change, Starship, Wallpaper, User folders, Set Mouse theme, Install Nautilus, Darkmode theme
 
 ## Roadmap
 - [x] Add Screenshot Utility

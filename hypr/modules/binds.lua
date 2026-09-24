@@ -3,7 +3,7 @@ local programs = require("modules.programs")
 local mainMod = "SUPER"
 
 -- Screenshot.
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call screenshot selectAndCopy"))
+hl.bind("Print", hl.dsp.exec_cmd("qs ipc call screenshot selectAndCopy"))
 
 -- Notification center.
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))

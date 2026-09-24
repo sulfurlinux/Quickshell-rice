@@ -13,7 +13,7 @@
     {
       "type": "gpu",
       "key": "GPU",
-      "format": "GeForce RTX 3060 Ti"
+      "format": "Nvidia GeForce RTX 3060 Ti"
     },
     "datetime",
     "break",
