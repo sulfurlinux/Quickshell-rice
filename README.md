@@ -27,13 +27,13 @@ Run the installation commands in **Bash**. Other distributions need equivalent p
 Install the applications used by the setup, plus screenshot, audio, brightness, media, and wallpaper-color tools:
 
 ```bash
-sudo pacman -S --needed quickshell ghostty hyprlock fish fastfetch \
+sudo pacman -S --needed quickshell ghostty hyprlock ly fish fastfetch \
   ttf-jetbrains-mono-nerd nautilus zed starship firefox \
   grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl cava python \
   xorg-xrandr git base-devel
 ```
 
-Optional packages: `ly` for a login manager, `btop` for the included system-tool config, and Spotify and Discord for their scratchpad shortcuts. Installing a login manager does not configure or enable it.
+Optional packages: `btop` for the included system-tool config, and Spotify and Discord for their scratchpad shortcuts.
 
 The cursor theme is installed from the AUR. If you already have `yay`, skip its build commands:
 
