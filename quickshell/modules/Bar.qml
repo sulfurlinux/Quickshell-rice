@@ -10,6 +10,7 @@ PanelWindow {
     property var theme
     property var launcher
     property var screenshot
+    property var services
 
     property string currentTime: "--:--"
     property string sinkVolume: "0%"
@@ -168,6 +169,20 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
+            BarMusic {
+                theme: root.theme
+                services: root.services
+                Layout.preferredWidth: Math.max(110, Math.min(300, root.width * 0.22))
+                Layout.minimumWidth: 100
+                Layout.maximumWidth: 300
+            }
+
+            BarSpectrum {
+                theme: root.theme
+                services: root.services
+                visible: root.width >= 1000 && root.services && root.services.cavaAvailable
+            }
+
             Text {
                 Layout.alignment: Qt.AlignVCenter
                 text: root.currentTime
@@ -183,6 +198,12 @@ PanelWindow {
             RowLayout {
                 spacing: 8
                 Layout.alignment: Qt.AlignRight
+
+                BarResources {
+                    theme: root.theme
+                    services: root.services
+                    showDisk: root.width >= 1200
+                }
 
                 Rectangle {
                     height: 28

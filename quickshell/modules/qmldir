@@ -1,4 +1,9 @@
 Bar 1.0 Bar.qml
+BarServices 1.0 BarServices.qml
+BarButton 1.0 BarButton.qml
+BarMusic 1.0 BarMusic.qml
+BarResources 1.0 BarResources.qml
+BarSpectrum 1.0 BarSpectrum.qml
 Launcher 1.0 Launcher.qml
 Notifications 1.0 Notifications.qml
 Screenshot 1.0 Screenshot.qml

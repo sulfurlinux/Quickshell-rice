@@ -76,6 +76,8 @@ Scope {
         id: screenshotTool
     }
 
+    Rice.BarServices { id: barServices }
+
     Rice.Launcher {
         id: globalLauncher
         onWallpaperSelected: path => {
@@ -185,6 +187,7 @@ Scope {
 
         delegate: Component {
             Rice.Bar {
+                services: barServices
                 required property var modelData
 
                 screen: modelData

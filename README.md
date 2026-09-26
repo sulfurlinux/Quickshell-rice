@@ -6,7 +6,7 @@ The setup is a work in progress. See [Roadmap](#roadmap) for planned features.
 
 ## What's included
 
-- **Quickshell:** a bar with workspaces, clock, and audio controls; an app launcher; notifications; screenshots; and a wallpaper picker.
+- **Quickshell:** a bar with workspaces, clock, audio and music controls, Cava, and system resource usage; an app launcher; notifications; screenshots; and a wallpaper picker.
 - **Hyprland:** window rules, keyboard shortcuts, Spotify and Discord scratchpads, and a Hyprlock config.
 - **Wallpaper colors:** a Python script that derives an accent color for Quickshell, Hyprland borders and shadows, and Hyprlock.
 - **Terminal:** Ghostty with cursor shaders, Fish, and a Starship prompt.
@@ -29,11 +29,11 @@ Install the applications used by the setup, plus screenshot, audio, brightness, 
 ```bash
 sudo pacman -S --needed quickshell ghostty hyprlock fish fastfetch \
   ttf-jetbrains-mono-nerd nautilus zed starship firefox \
-  grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl python \
+  grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl cava python \
   xorg-xrandr git base-devel
 ```
 
-Optional packages: `ly` for a login manager, `btop` and `cava` for the included system-tool configs, and Spotify and Discord for their scratchpad shortcuts. Installing a login manager does not configure or enable it.
+Optional packages: `ly` for a login manager, `btop` for the included system-tool config, and Spotify and Discord for their scratchpad shortcuts. Installing a login manager does not configure or enable it.
 
 The cursor theme is installed from the AUR. If you already have `yay`, skip its build commands:
 
@@ -183,6 +183,14 @@ After copying the updated configs, restart Quickshell to enable recording in the
 
 History is refreshed each time you open the clipboard submenu. Entries are shown newest first; search narrows the list to at most 49 matches.
 
+### Bar
+
+The music section shows the active MPRIS player's track and artist, with previous, play/pause, and next controls. Click the track to open its player; right-click it to switch between players. It disappears when no player is available, and unsupported controls are disabled.
+
+Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. On displays narrower than 1000 logical pixels, the spectrum is hidden to leave room for controls.
+
+CPU and RAM percentages refresh every two seconds. Disk usage for `/` also appears on displays at least 1200 logical pixels wide. Hover over the resource readings for used/total RAM and disk space. All displays share one resource monitor and one Cava process; errors appear in the Quickshell logs.
+
 ### Notifications and screenshots
 
 The notification center shows arrival timestamps. Use its **DND on/off** button to suppress notification popups while keeping them in history. Turning DND off resumes new popups without replaying earlier notifications.
@@ -205,12 +213,12 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] Extract color palette from wallpaper
   - [x] Integratation in Quickshell
   - [x] Integratation in Hyprland
-- [ ] Bar
-  - [ ] Music
+- [x] Bar
+  - [x] Music
   - [x] Dynamic workspaces
   - [x] Audio meter
-  - [ ] Cava
-  - [ ] System resource usage
+  - [x] Cava
+  - [x] System resource usage
   - [x] Clock
 - [ ] Customize lockscreen / login screen
 - [ ] Customize Boot animation / limine
