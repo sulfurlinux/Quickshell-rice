@@ -32,6 +32,12 @@ PanelWindow {
     property var clipboardEntries: []
     property bool clipboardLoaded: false
     property string clipboardError: ""
+    property var runningApps: []
+    property bool runningAppsLoaded: false
+    property string runningAppsError: ""
+    readonly property string runningAppsScript: decodeURIComponent(
+        Qt.resolvedUrl("running_apps.py").toString().replace(/^file:\/\//, ""))
+    readonly property bool inKillMenu: /^\/pkill(?:\s|$)/.test(searchInput.text.toLowerCase().trim())
     readonly property string clipboardScript: decodeURIComponent(
         Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
     readonly property bool inClipboardMenu: /^\/clipboard(?:\s|$)/.test(searchInput.text.toLowerCase().trim())
@@ -63,6 +69,7 @@ PanelWindow {
 
     property var systemCommands: [
         { name: "/clipboard", exec: "list_clipboard", desc: "Clipboard history" },
+        { name: "/pkill", exec: "list_running_apps", desc: "Terminate a running app" },
         { name: "/power", exec: "list_power_actions", desc: "Power and session actions" },
         { name: "/wallpaper", exec: "list_wallpapers", desc: "Select a wallpaper" }
     ]
@@ -73,6 +80,45 @@ PanelWindow {
 
     Process { id: execProcess }
     Process { id: saveHistoryProcess }
+
+    Process {
+        id: loadRunningAppsProcess
+        command: ["python3", root.runningAppsScript, "list"]
+        stderr: SplitParser { onRead: data => console.warn("Running apps: " + data) }
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const result = JSON.parse(data);
+                    root.runningApps = result.apps;
+                    root.runningAppsError = result.error;
+                } catch (error) {
+                    root.runningAppsError = "Apps unavailable — see qs logs";
+                    console.warn("Running apps: " + error);
+                }
+                root.runningAppsLoaded = true;
+                if (root.inKillMenu) root.filterApps();
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                root.runningAppsError = "Apps unavailable — see qs logs";
+                root.runningAppsLoaded = true;
+                if (root.inKillMenu) root.filterApps();
+            }
+        }
+    }
+
+    Process {
+        id: terminateAppProcess
+        stderr: SplitParser { onRead: data => console.warn("Terminate app: " + data) }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) root.visible = false;
+            else {
+                root.runningAppsError = "Could not stop app — see qs logs";
+                if (root.inKillMenu) root.filterApps();
+            }
+        }
+    }
 
     function openClipboard() {
         root.visible = true;
@@ -238,7 +284,23 @@ print(json.dumps(res))
 
         let matched = []
 
-        if (/^\/clipboard(?:\s|$)/.test(query)) {
+        if (root.inKillMenu) {
+            if (!runningAppsLoaded && !loadRunningAppsProcess.running) loadRunningAppsProcess.running = true;
+            const appFilter = query.slice("/pkill".length).trim();
+            if (!runningAppsLoaded || runningAppsError) {
+                matched.push({ name: runningAppsError || "Loading running apps…", path: "", exec: "", count: 0 });
+            } else {
+                for (const app of runningApps) {
+                    const label = app.name + (app.title ? " — " + app.title : "") + " (PID " + app.pid + ")";
+                    if (label.toLowerCase().includes(appFilter) && matched.length < 49) {
+                        matched.push({ name: label, path: "", count: 0,
+                            exec: "pkill_app:" + app.pid + ":" + app.identity });
+                    }
+                }
+                if (matched.length === 0) matched.push({ name: "No matching running apps", path: "", exec: "", count: 0 });
+            }
+            matched.push({ name: "← Back to commands", path: "", exec: "power_back", count: 0 });
+        } else if (/^\/clipboard(?:\s|$)/.test(query)) {
             if (!clipboardLoaded && !loadClipboardProcess.running) loadClipboardProcess.running = true;
             const clipboardFilter = query.slice("/clipboard".length).trim();
             if (!clipboardLoaded || clipboardError) {
@@ -337,6 +399,22 @@ print(json.dumps(res))
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
+        if (execCmd === "list_running_apps") {
+            root.runningAppsLoaded = false;
+            root.runningAppsError = "";
+            searchInput.text = "/pkill ";
+            searchInput.forceActiveFocus();
+            root.filterApps();
+            return;
+        }
+        if (execCmd.startsWith("pkill_app:")) {
+            const selection = execCmd.slice("pkill_app:".length).split(":");
+            if (selection.length !== 2 || !selection.every(value => /^\d+$/.test(value))
+                || terminateAppProcess.running) return;
+            terminateAppProcess.exec(["python3", root.runningAppsScript, "terminate", selection[0], selection[1]]);
+            return;
+        }
+
         if (execCmd === "list_clipboard") {
             root.openClipboard();
             return;
@@ -416,6 +494,8 @@ with open(path, 'w') as f:
             root.wallpapersLoaded = false
             root.clipboardLoaded = false
             root.clipboardError = ""
+            root.runningAppsLoaded = false
+            root.runningAppsError = ""
             searchInput.text = ""
             loadHistoryProcess.running = true
             if (allApps.length === 0) {
@@ -500,7 +580,7 @@ with open(path, 'w') as f:
                         Keys.onUpPressed: root.moveSelection(-1)
 
                         Keys.onEscapePressed: {
-                            if (root.inPowerMenu || root.inClipboardMenu) searchInput.text = "/";
+                            if (root.inPowerMenu || root.inClipboardMenu || root.inKillMenu) searchInput.text = "/";
                             else root.visible = false;
                         }
 

@@ -161,6 +161,8 @@ Run `hyprctl reload` after editing. Start a new Hyprland session to see each dis
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/power` to open the shutdown, restart, lock, and logout submenu. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
 
+Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
+
 All power and session actions run immediately without a confirmation dialog.
 
 ### Clipboard history
@@ -190,9 +192,9 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - [x] Cursor
 - [x] Fancy Text cursor in the Terminal
 - [x] Logout menu
-- [ ] Launcher
+- [x] Launcher
   - [x] App Launcher
-  - [ ] pkiller
+  - [x] pkiller
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [ ] Dynamic theme system
