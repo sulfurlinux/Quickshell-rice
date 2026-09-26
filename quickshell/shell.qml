@@ -1,7 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import "./modules/"
+import "./modules" as Rice
 
 Scope {
     id: root
@@ -48,16 +48,16 @@ if os.path.exists(path):
         }
     }
 
-    Screenshot {
+    Rice.Screenshot {
         id: screenshotTool
     }
 
-    Launcher {
+    Rice.Launcher {
         id: globalLauncher
         theme: root.currentTheme
     }
 
-    Notifications {
+    Rice.Notifications {
         id: notificationCenter
         theme: root.currentTheme
     }
@@ -116,7 +116,7 @@ if os.path.exists(path):
             : [Quickshell.screens.find(s => s.name === primaryMonitorName) ?? Quickshell.screens.primary]
 
         delegate: Component {
-            Wallpaper {
+            Rice.Wallpaper {
                 required property var modelData
                 screen: modelData
             }
@@ -129,7 +129,7 @@ if os.path.exists(path):
             : [Quickshell.screens.find(s => s.name === primaryMonitorName) ?? Quickshell.screens.primary]
 
         delegate: Component {
-            Bar {
+            Rice.Bar {
                 required property var modelData
 
                 screen: modelData
