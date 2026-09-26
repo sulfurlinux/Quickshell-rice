@@ -353,6 +353,7 @@ with open(path, 'w') as f:
 
                     Text {
                         text: ""
+                        color: searchInput.color
                         font.pixelSize: 14
                     }
 
@@ -447,12 +448,14 @@ with open(path, 'w') as f:
                             Text {
                                 anchors.centerIn: parent
                                 text: model.path === undefined || model.path === "" ? (model.name.startsWith("/") ? "" : "󱓞") : ""
+                                color: resultLabel.color
                                 font.pixelSize: 14
                                 visible: model.path === undefined || model.path === ""
                             }
                         }
 
                         Text {
+                            id: resultLabel
                             Layout.fillWidth: true
                             text: (model.path !== undefined && model.path !== "") ? model.name : model.name
                             color: isSelected
