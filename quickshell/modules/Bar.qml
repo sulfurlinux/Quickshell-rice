@@ -121,10 +121,11 @@ PanelWindow {
         }
 
         Flickable {
+            id: workspaces
             anchors.left: parent.left
-            anchors.right: clock.left
+            width: Math.max(0, Math.min(workspaceRow.width, clock.x - resources.implicitWidth - 46))
             anchors.leftMargin: 10
-            anchors.rightMargin: 12
+
             anchors.verticalCenter: parent.verticalCenter
             height: 28
             contentWidth: workspaceRow.width
@@ -180,43 +181,67 @@ PanelWindow {
 
         }
 
-        RowLayout {
-            anchors.left: clock.right
-            anchors.right: parent.right
+        Item {
+            anchors.left: workspaces.right
+            anchors.right: clock.left
             anchors.leftMargin: 12
-            anchors.rightMargin: 10
+            anchors.rightMargin: 12
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.topMargin: 6
-            anchors.bottomMargin: 6
-            spacing: 8
+            clip: true
+            BarResources {
+                id: resources
+                anchors.centerIn: parent
+                theme: root.theme
+                services: root.services
+            }
+        }
+
+        Item {
+            id: musicSpace
+            anchors.left: clock.right
+            anchors.right: audioControls.left
+            anchors.leftMargin: 12
+            anchors.rightMargin: 12
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             clip: true
 
-            Item { Layout.fillWidth: true }
+            RowLayout {
+                anchors.centerIn: parent
+                width: Math.max(0, Math.min(parent.width - 16,
+                    (music.visible ? 300 : 0) + (spectrum.visible ? 70 : 0)
+                    + (music.visible && spectrum.visible ? 8 : 0)))
+                height: 28
+                spacing: 8
 
-            BarMusic {
-                theme: root.theme
-                services: root.services
-                Layout.fillWidth: true
-                Layout.preferredWidth: 300
-                Layout.minimumWidth: 100
-                Layout.maximumWidth: 300
-            }
+                BarMusic {
+                    id: music
+                    theme: root.theme
+                    services: root.services
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 100
+                    Layout.maximumWidth: 300
+                }
 
-            BarSpectrum {
-                theme: root.theme
-                services: root.services
-                visible: root.width >= 1000 && root.services && root.services.cavaAvailable
+                BarSpectrum {
+                    id: spectrum
+                    theme: root.theme
+                    services: root.services
+                    visible: musicSpace.width >= 220 && root.services && root.services.cavaAvailable
+                }
             }
+        }
 
-            BarResources {
-                theme: root.theme
-                services: root.services
-                Layout.rightMargin: 8
-            }
+        RowLayout {
+            id: audioControls
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
 
             Rectangle {
-                height: 28
+                implicitHeight: 28
                 implicitWidth: micRow.implicitWidth + 12
                 radius: 6
                 color: theme ? theme.surface : "#313244"
@@ -262,7 +287,7 @@ PanelWindow {
             }
 
             Rectangle {
-                height: 28
+                implicitHeight: 28
                 implicitWidth: sinkRow.implicitWidth + 12
                 radius: 6
                 color: theme ? theme.surface : "#313244"

@@ -187,7 +187,7 @@ History is refreshed each time you open the clipboard submenu. Entries are shown
 
 The music section shows the active MPRIS player's track and artist, with previous, play/pause, and next controls. Click the track to open its player; right-click it to switch between players. It disappears when no player is available, and unsupported controls are disabled.
 
-Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. On displays narrower than 1000 logical pixels, the spectrum is hidden to leave room for controls.
+Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. The spectrum is hidden when the space between the clock and audio controls is too narrow.
 
 CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process; errors appear in the Quickshell logs.
 
