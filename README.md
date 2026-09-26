@@ -1,60 +1,148 @@
 # Quickshell-rice
-A personal Linux rice using Arch, Hyprland and Quickshell.
 
-## Install
-1. Make sure you got the dependencies installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
+A personal Linux desktop setup for Arch Linux, Hyprland, and Quickshell. This repository contains the desktop shell and configs for the terminal, prompt, system information tools, and lock screen.
+
+The setup is a work in progress. See [Todo](#todo) for known issues and [Roadmap](#roadmap) for planned features.
+
+## What's included
+
+- **Quickshell:** a bar with workspaces, clock, and audio controls; an app launcher; notifications; screenshots; and a wallpaper picker.
+- **Hyprland:** window rules, keyboard shortcuts, Spotify and Discord scratchpads, and a Hyprlock config.
+- **Wallpaper colors:** a Python script that derives an accent color from the wallpaper for Quickshell and generates Hyprlock theme files.
+- **Terminal:** Ghostty with cursor shaders, Fish, and a Starship prompt.
+- **System tools:** Fastfetch, btop, and Cava configs.
+
+## Before installing
+
+Use an existing Arch Linux installation with a working Hyprland session. The Hyprland config in this repository uses Lua (`hypr/hyprland.lua`); your Hyprland installation must support that configuration format.
+
+These are personal configs, so monitor names, application choices, and home-directory paths need adjusting. Back up any existing configs you want to keep: the copy commands below overwrite matching files.
+
+Run the installation commands in **Bash**. Other distributions need equivalent packages installed with their own package manager.
+
+## Installation
+
+### 1. Install dependencies
+
+Install the applications used by the setup, plus screenshot, audio, brightness, media, and wallpaper-color tools:
+
+```bash
+sudo pacman -S --needed quickshell ghostty hyprlock fish fastfetch \
+  ttf-jetbrains-mono-nerd nautilus zed starship firefox \
+  grim slurp wl-clipboard wireplumber brightnessctl playerctl python \
+  xorg-xrandr git base-devel
 ```
-sudo pacman -S quickshell ghostty hyprlock ly fish fastfetch ttf-jetbrains-mono-nerd nautilus zed starship
-sudo pacman -S --needed git base-devel
+
+Optional packages: `ly` for a login manager, `btop` and `cava` for the included system-tool configs, and Spotify and Discord for their scratchpad shortcuts. Installing a login manager does not configure or enable it.
+
+The cursor theme is installed from the AUR. If you already have `yay`, skip its build commands:
+
+```bash
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
 cd ..
-rm -rf yay
 yay -S rose-pine-hyprcursor
 ```
-If encounter a prompt like this, you can simply press enter to continue.
-![alt text](Install.png)
 
-2. Clone the repository and move the needed files into your .config directory
-```
+Read package-manager prompts before accepting them. Press Enter when the displayed default is the option you want.
+
+![Example package installation prompt](Install.png)
+
+### 2. Copy the configs
+
+Clone the repository, then copy only the configuration directories and Starship config into `~/.config`:
+
+```bash
 git clone https://github.com/sulfurlinux/Quickshell-rice.git
 cd Quickshell-rice
-rm -rf .gitignore .lunarc.json README.md
-cp -r * /home/$USER/.config/
-cd ..
-rm -rf Quickshell-rice
+mkdir -p "$HOME/.config"
+cp -r hypr quickshell ghostty fish fastfetch btop cava "$HOME/.config/"
+cp starship.toml "$HOME/.config/"
 ```
 
-3. Change the shell to fish
+Keep the cloned repository if you want to pull updates or edit the source later.
+
+### 3. Personalize paths and hardware settings
+
+Edit the copied files in `~/.config` before loading the setup:
+
+| File | What to adjust |
+| --- | --- |
+| `hypr/modules/monitors.lua` | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs. |
+| `hypr/modules/autostart.lua` and `quickshell/shell.qml` | The `DP-1` primary-monitor setting, if your output has a different name. |
+| `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications. |
+| `quickshell/modules/Wallpaper.qml` | Replace every `/home/sulfur` with your actual home-directory path, including the Python environment and wallpaper cache paths. |
+| `fish/config.fish` and `fish/fish_variables` | Remove or adapt the personal Spicetify paths if you do not use them. |
+
+Create the user folders and the Python environment used by the wallpaper-color script:
+
+```bash
+mkdir -p "$HOME"/{Desktop,Documents,Downloads,Music,Pictures/Wallpapers,Videos}
+python3 -m venv "$HOME/.cache/quickshell_venv"
+"$HOME/.cache/quickshell_venv/bin/python3" -m pip install Pillow
 ```
+
+Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or change the default wallpaper paths in `Wallpaper.qml` to point to your own image. Additional wallpapers in that directory can be selected through the launcher.
+
+Generate the initial theme files used by Quickshell and Hyprlock:
+
+```bash
+"$HOME/.cache/quickshell_venv/bin/python3" \
+  "$HOME/.config/quickshell/modules/extract_color.py" \
+  "$HOME/Pictures/Wallpapers/wallpaper.png"
+```
+
+If you chose another image, use its path in the command above.
+
+### 4. Apply the shell and appearance settings
+
+To make Fish your login shell:
+
+```bash
 chsh -s /usr/bin/fish
 ```
 
-4. Set the hyprcursor and gtk theme
-```
+The shell change takes effect the next time you log in.
+
+From your Hyprland session, apply the cursor and GTK appearance:
+
+```bash
 hyprctl setcursor rose-pine-hyprcursor 28
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 ```
 
-5. Setup the user folders if they don't exist yet (Executing the command if they do exist won't do anything and will not overwrite any existing files)
-```
-mkdir /home/$USER/Desktop
-mkdir /home/$USER/Documents
-mkdir /home/$USER/Downloads
-mkdir /home/$USER/Music
-mkdir /home/$USER/Pictures
-mkdir /home/$USER/Pictures/Wallpapers
-mkdir /home/$USER/Videos
-```
+### 5. Load the setup
 
-6. Reload
-```
+Reload Hyprland:
+
+```bash
 hyprctl reload
 ```
 
+Quickshell starts automatically when a new Hyprland session starts. To start it in the current session if it is not already running:
+
+```bash
+qs
+```
+
+## Everyday controls
+
+`Super` is usually the Windows key. All bindings are defined in `hypr/modules/binds.lua`.
+
+| Shortcut | Action |
+| --- | --- |
+| `Super + Space` | Toggle the launcher |
+| `Super + N` | Toggle the notification center |
+| `Print` | Select a screenshot area, save it, and copy it to the clipboard |
+| `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor |
+| `Super + Shift + R` | Reload Hyprland and restart Quickshell |
+
+Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/lock` to lock the screen. It also provides `/shutdown`, `/reboot`, and `/logout` commands.
+
 ## Todo
+
 - Add timestamps and a do not disturb to the notification center
 - Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
@@ -65,6 +153,7 @@ hyprctl reload
 - Fix the Launcher Scaling
 
 ## Roadmap
+
 - [x] Add Screenshot Utility
 - [ ] Clipboard
 - [x] Cursor
