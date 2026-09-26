@@ -221,8 +221,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] System resource usage
   - [x] Clock
 - [ ] Customize lockscreen / login screen
-- [ ] Customize Boot animation / limine
-- [ ] Music player
 - [x] Custom Spotify and Discord scratchpads
 - [ ] Fetch / system information
 - [x] Notification System
