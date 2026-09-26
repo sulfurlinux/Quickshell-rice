@@ -10,6 +10,7 @@ Scope {
     property var theme
     property int notificationTimeout: 5000
     property bool centerVisible: false
+    property bool doNotDisturb: false
     property var history: []
     property var historyLocks: []
     readonly property int historyLimit: 100
@@ -21,17 +22,25 @@ Scope {
     }
 
     function addToHistory(notification) {
+        root.removeFromHistory(notification)
         const lock = lockComponent.createObject(root, {
             object: notification,
             locked: true
         })
 
         historyLocks.push({ id: notification.id, lock: lock })
-        history = [notification, ...history].slice(0, historyLimit)
+        const entry = {
+            notification: notification,
+            receivedAt: notification.lastGeneration ? null : new Date()
+        }
+        history = [entry, ...history]
+        while (history.length > historyLimit) {
+            root.removeFromHistory(history[history.length - 1].notification)
+        }
     }
 
     function removeFromHistory(notification) {
-        history = history.filter(entry => entry.id !== notification.id)
+        history = history.filter(entry => entry.notification.id !== notification.id)
 
         for (let i = historyLocks.length - 1; i >= 0; --i) {
             if (historyLocks[i].id === notification.id) {
@@ -47,8 +56,8 @@ Scope {
         history = []
 
         for (const entry of entries) {
-            if (entry.tracked) {
-                entry.dismiss()
+            if (entry.notification.tracked) {
+                entry.notification.dismiss()
             }
         }
 
@@ -77,6 +86,7 @@ Scope {
 
     PanelWindow {
         id: popupWindow
+        visible: !root.doNotDisturb && popupColumn.implicitHeight > 0
 
         screen: Quickshell.screens.primary
 
@@ -107,7 +117,14 @@ Scope {
 
                 delegate: Rectangle {
                     required property var modelData
-                    property bool popupVisible: true
+                    property bool popupVisible: false
+                    Component.onCompleted: popupVisible = !root.doNotDisturb && !modelData.lastGeneration
+                    Connections {
+                        target: root
+                        function onDoNotDisturbChanged() {
+                            if (root.doNotDisturb) popupVisible = false;
+                        }
+                    }
 
                     Layout.fillWidth: true
                     implicitHeight: popupVisible ? popupContent.implicitHeight + 24 : 0
@@ -119,7 +136,7 @@ Scope {
 
                     Timer {
                         interval: root.notificationTimeout
-                        running: true
+                        running: popupVisible
                         repeat: false
                         onTriggered: popupVisible = false
                     }
@@ -263,6 +280,39 @@ Scope {
                         Layout.fillWidth: true
                     }
 
+                    Button {
+                        id: dndButton
+                        text: root.doNotDisturb ? "DND on" : "DND off"
+                        checkable: true
+                        checked: root.doNotDisturb
+                        onToggled: root.doNotDisturb = checked
+                        implicitWidth: implicitContentWidth + 20
+                        implicitHeight: 28
+                        Accessible.name: "Do not disturb"
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Hide notification popups; keep notifications in history"
+
+                        contentItem: Text {
+                            text: dndButton.text
+                            color: root.doNotDisturb
+                                ? (root.theme ? root.theme.background : "#1e1e2e")
+                                : (root.theme ? root.theme.text : "#cdd6f4")
+                            font.pixelSize: 11
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            radius: 6
+                            color: root.doNotDisturb
+                                ? (root.theme ? root.theme.accent : "#cba6f7")
+                                : (root.theme ? root.theme.surface : "#313244")
+                            border.width: 1
+                            border.color: dndButton.visualFocus || dndButton.hovered
+                                ? (root.theme ? root.theme.text : "#cdd6f4") : "transparent"
+                        }
+                    }
+
                     Rectangle {
                         implicitWidth: clearText.implicitWidth + 20
                         height: 28
@@ -321,6 +371,7 @@ Scope {
 
                         delegate: Rectangle {
                             required property var modelData
+                            readonly property var notification: modelData.notification
 
                             width: historyList.width
                             implicitHeight: historyContent.implicitHeight + 24
@@ -332,8 +383,8 @@ Scope {
                             TapHandler {
                                 acceptedButtons: Qt.LeftButton
                                 onTapped: {
-                                    if (modelData.actions.length > 0) {
-                                        modelData.actions[0].invoke()
+                                    if (notification.actions.length > 0) {
+                                        notification.actions[0].invoke()
                                     }
                                 }
                             }
@@ -352,8 +403,8 @@ Scope {
                                     Image {
                                         Layout.preferredWidth: 24
                                         Layout.preferredHeight: 24
-                                        source: modelData.appIcon
-                                            ? Quickshell.iconPath(modelData.appIcon, "application-x-executable")
+                                        source: notification.appIcon
+                                            ? Quickshell.iconPath(notification.appIcon, "application-x-executable")
                                             : ""
                                         visible: source.length > 0
                                         fillMode: Image.PreserveAspectFit
@@ -361,11 +412,20 @@ Scope {
 
                                     Text {
                                         Layout.fillWidth: true
-                                        text: modelData.appName
+                                        text: notification.appName
                                         color: root.theme ? root.theme.subtext : "#a6adc8"
                                         font.pixelSize: 12
                                         font.bold: true
                                         elide: Text.ElideRight
+                                    }
+
+                                    Text {
+                                        text: modelData.receivedAt
+                                            ? Qt.formatDateTime(modelData.receivedAt, "dd MMM · HH:mm")
+                                            : "Before reload"
+                                        color: root.theme ? root.theme.subtext : "#a6adc8"
+                                        font.pixelSize: 11
+                                        Layout.alignment: Qt.AlignVCenter
                                     }
 
                                     Rectangle {
@@ -385,14 +445,14 @@ Scope {
                                         MouseArea {
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: root.removeFromHistory(modelData)
+                                            onClicked: root.removeFromHistory(notification)
                                         }
                                     }
                                 }
 
                                 Text {
                                     Layout.fillWidth: true
-                                    text: modelData.summary
+                                    text: notification.summary
                                     color: root.theme ? root.theme.text : "#cdd6f4"
                                     font.pixelSize: 14
                                     font.bold: true
@@ -402,7 +462,7 @@ Scope {
                                 Text {
                                     Layout.fillWidth: true
                                     visible: text.length > 0
-                                    text: modelData.body
+                                    text: notification.body
                                     color: root.theme ? root.theme.text : "#cdd6f4"
                                     font.pixelSize: 13
                                     wrapMode: Text.Wrap
