@@ -222,7 +222,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] Clock
 - [ ] Customize lockscreen / login screen
 - [x] Custom Spotify and Discord scratchpads
-- [ ] Fetch / system information
 - [x] Notification System
   - [x] Notification daemon
   - [x] Notification center
