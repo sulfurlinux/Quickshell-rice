@@ -67,13 +67,13 @@ Keep the cloned repository if you want to pull updates or edit the source later.
 
 Edit the copied files in `~/.config` before loading the setup:
 
-| File | What to adjust |
-| --- | --- |
-| `hypr/modules/monitors.lua` | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs. |
-| `hypr/modules/autostart.lua` and `quickshell/shell.qml` | The `DP-1` primary-monitor setting, if your output has a different name. |
-| `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications. |
-| `quickshell/modules/Wallpaper.qml` | Replace every `/home/sulfur` with your actual home-directory path, including the Python environment and wallpaper cache paths. |
-| `fish/config.fish` and `fish/fish_variables` | Remove or adapt the personal Spicetify paths if you do not use them. |
+| File                                                     | What to adjust                                                                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `hypr/modules/monitors.lua`                              | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs.                          |
+| `hypr/modules/autostart.lua` and `quickshell/shell.qml`  | The `DP-1` primary-monitor setting, if your output has a different name.                                                       |
+| `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications.                                                                   |
+| `quickshell/modules/Wallpaper.qml`                       | Replace every `/home/sulfur` with your actual home-directory path, including the Python environment and wallpaper cache paths. |
+| `fish/config.fish` and `fish/fish_variables`             | Remove or adapt the personal Spicetify paths if you do not use them.                                                           |
 
 Create the user folders and the Python environment used by the wallpaper-color script:
 
@@ -131,13 +131,13 @@ qs
 
 `Super` is usually the Windows key. All bindings are defined in `hypr/modules/binds.lua`.
 
-| Shortcut | Action |
-| --- | --- |
-| `Super + Space` | Toggle the launcher |
-| `Super + N` | Toggle the notification center |
-| `Print` | Select a screenshot area, save it, and copy it to the clipboard |
-| `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor |
-| `Super + Shift + R` | Reload Hyprland and restart Quickshell |
+| Shortcut                      | Action                                                          |
+| ----------------------------- | --------------------------------------------------------------- |
+| `Super + Space`               | Toggle the launcher                                             |
+| `Super + N`                   | Toggle the notification center                                  |
+| `Print`                       | Select a screenshot area, save it, and copy it to the clipboard |
+| `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor             |
+| `Super + Shift + R`           | Reload Hyprland and restart Quickshell                          |
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/lock` to lock the screen. It also provides `/shutdown`, `/reboot`, and `/logout` commands.
 
