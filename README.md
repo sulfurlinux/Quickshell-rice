@@ -206,7 +206,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] Integratation in Quickshell
   - [x] Integratation in Hyprland
 - [ ] Bar
-  - [ ] Logout menu button
   - [ ] Music
   - [x] Dynamic workspaces
   - [x] Audio meter
