@@ -39,7 +39,7 @@ PanelWindow {
         let total = 0;
         for (let i = 0; i < appListModel.count; i++) {
             const result = appListModel.get(i);
-            total += result.path ? 48 : 40;
+            total += result.path || result.clipboardImage ? 48 : 40;
         }
         return total + Math.max(0, appListModel.count - 1) * appList.spacing;
     }
@@ -247,7 +247,8 @@ print(json.dumps(res))
                 for (let i = 0; i < clipboardEntries.length && matched.length < 49; i++) {
                     const entry = clipboardEntries[i];
                     if (entry.preview.toLowerCase().includes(clipboardFilter)) {
-                        matched.push({ name: entry.preview, path: "", exec: "clipboard_copy:" + entry.id, count: 0 });
+                        matched.push({ name: entry.preview, path: "", exec: "clipboard_copy:" + entry.id, count: 0,
+                            clipboardImage: entry.isImage === true });
                     }
                 }
                 if (matched.length === 0) matched.push({
@@ -282,7 +283,8 @@ print(json.dumps(res))
                             name: wallpaper.name,
                             path: wallpaper.path,
                             exec: wallpaper.exec,
-                            count: 0
+                            count: 0,
+                            clipboardImage: false
                         });
                     }
                 }
@@ -325,6 +327,7 @@ print(json.dumps(res))
 
         let limit = Math.min(matched.length, 50)
         for (let i = 0; i < limit; i++) {
+            matched[i].clipboardImage = matched[i].clipboardImage === true;
             appListModel.append(matched[i])
         }
 
@@ -533,8 +536,24 @@ with open(path, 'w') as f:
                     required property var model
                     required property int index
 
+                    readonly property bool hasClipboardImage: model.clipboardImage === true
+                    property string clipboardImageSource: ""
+
+                    Process {
+                        running: hasClipboardImage
+                        command: ["python3", root.clipboardScript, "preview",
+                            model.exec.slice("clipboard_copy:".length)]
+                        stdout: SplitParser {
+                            onRead: data => {
+                                try { clipboardImageSource = JSON.parse(data).source; }
+                                catch (error) { console.warn("Clipboard thumbnail: " + error); }
+                            }
+                        }
+                        stderr: SplitParser { onRead: data => console.warn("Clipboard thumbnail: " + data) }
+                    }
+
                     width: appList.width
-                    height: model.path !== undefined && model.path !== "" ? 48 : 40
+                    height: hasClipboardImage || (model.path !== undefined && model.path !== "") ? 48 : 40
                     radius: 6
 
                     property bool isSelected: index === appList.currentIndex
@@ -550,15 +569,15 @@ with open(path, 'w') as f:
                         spacing: 12
 
                         Item {
-                            width: model.path !== undefined && model.path !== "" ? 64 : 28
-                            height: model.path !== undefined && model.path !== "" ? 36 : 28
+                            Layout.preferredWidth: hasClipboardImage || model.path !== "" ? 64 : 28
+                            Layout.preferredHeight: hasClipboardImage || model.path !== "" ? 36 : 28
                             Layout.alignment: Qt.AlignVCenter
 
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 4
                                 color: "#11111b"
-                                visible: model.path !== undefined && model.path !== ""
+                                visible: hasClipboardImage || (model.path !== undefined && model.path !== "")
                                 border.color: isSelected ? (theme ? theme.background : "#1e1e2e") : (theme ? theme.accent : "#cba6f7")
                                 border.width: 1
 
@@ -566,8 +585,12 @@ with open(path, 'w') as f:
                                     id: thumbImage
                                     anchors.fill: parent
                                     anchors.margins: 1
-                                    source: (model.path !== undefined && model.path !== "") ? model.path : ""
-                                    fillMode: Image.PreserveAspectCrop
+                                    source: hasClipboardImage ? clipboardImageSource
+                                        : ((model.path !== undefined && model.path !== "") ? model.path : "")
+                                    sourceSize.width: 128
+                                    sourceSize.height: 72
+                                    asynchronous: true
+                                    fillMode: hasClipboardImage ? Image.PreserveAspectFit : Image.PreserveAspectCrop
                                     visible: source != ""
                                     clip: true
                                 }
@@ -579,7 +602,7 @@ with open(path, 'w') as f:
                                     ? (model.exec.startsWith("clipboard_copy:") ? "󰅍" : (model.name.startsWith("/") ? "" : "󱓞")) : ""
                                 color: resultLabel.color
                                 font.pixelSize: 14
-                                visible: model.path === undefined || model.path === ""
+                                visible: !hasClipboardImage && (model.path === undefined || model.path === "")
                             }
                         }
 
