@@ -141,7 +141,7 @@ qs
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/power` to open the shutdown, restart, lock, and logout submenu. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
 
-Restart and logout require confirmation. Choose the action button to proceed, or press `Escape` to cancel. Cancel is focused by default; shutdown and locking the screen are immediate.
+All power and session actions run immediately without a confirmation dialog.
 
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
 

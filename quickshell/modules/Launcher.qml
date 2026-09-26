@@ -29,7 +29,6 @@ PanelWindow {
     property var appHistory: ({})
     property var wallpapers: []
     property bool wallpapersLoaded: false
-    property var pendingPowerAction: null
     readonly property int resultsHeight: {
         let total = 0;
         for (let i = 0; i < appListModel.count; i++) {
@@ -256,26 +255,6 @@ print(json.dumps(res))
         root.resetScroll()
     }
 
-    function powerAction(execCmd) {
-        switch (execCmd.trim().replace(/\s+/g, " ")) {
-        case "systemctl reboot":
-            return { label: "Restart", command: ["systemctl", "reboot"] };
-        case "loginctl terminate-user $USER":
-            return { label: "Log out", command: ["loginctl", "terminate-user", Quickshell.env("USER")] };
-        default:
-            return null;
-        }
-    }
-
-    function confirmPowerAction() {
-        const action = root.pendingPowerAction;
-        root.pendingPowerAction = null;
-        if (!action) return;
-        execProcess.command = action.command;
-        execProcess.running = true;
-        root.visible = false;
-    }
-
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
@@ -293,12 +272,6 @@ print(json.dumps(res))
         const shortcut = powerCommands.find(cmd => cmd.name === execCmd.trim().toLowerCase());
         if (shortcut) execCmd = shortcut.exec;
 
-        const action = powerAction(execCmd);
-        if (action) {
-            root.pendingPowerAction = action;
-            powerConfirmation.open();
-            return;
-        }
 
         // Choose wallpaper – stores only the path; the Python Pillow script gets the actual color
         if (execCmd.startsWith("wallpaper_select:")) {
@@ -361,113 +334,12 @@ with open(path, 'w') as f:
             Qt.callLater(() => {
                 if (root.visible) searchInput.forceActiveFocus();
             })
-        } else {
-            powerConfirmation.close();
-            root.pendingPowerAction = null;
         }
     }
 
     MouseArea {
         anchors.fill: parent
         onClicked: root.visible = false
-    }
-
-    Dialog {
-        id: powerConfirmation
-        parent: launcherCard
-        anchors.centerIn: parent
-        width: Math.max(0, Math.min(360, root.width - 32))
-        modal: true
-        focus: true
-        closePolicy: Popup.CloseOnEscape
-        title: root.pendingPowerAction ? root.pendingPowerAction.label + "?" : "Confirm action"
-
-        background: Rectangle {
-            radius: 12
-            color: theme ? theme.background : "#1e1e2e"
-            border.color: theme ? theme.accent : "#cba6f7"
-            border.width: 2
-        }
-        header: Label {
-            text: powerConfirmation.title
-            color: theme ? theme.text : "#cdd6f4"
-            font.bold: true
-            font.pixelSize: 18
-            padding: 16
-        }
-        contentItem: Label {
-            text: "This will close your session. Unsaved work may be lost."
-            color: theme ? theme.text : "#cdd6f4"
-            wrapMode: Text.WordWrap
-        }
-        footer: DialogButtonBox {
-            padding: 16
-            spacing: 8
-            background: Item {}
-
-            Button {
-                id: cancelPowerAction
-                text: "Cancel"
-                implicitWidth: Math.max(96, implicitContentWidth + 24)
-                implicitHeight: 36
-                contentItem: Text {
-                    text: cancelPowerAction.text
-                    color: theme ? theme.text : "#cdd6f4"
-                    font: cancelPowerAction.font
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    radius: 6
-                    color: cancelPowerAction.down
-                        ? Qt.darker(theme ? theme.surface : "#313244", 1.15)
-                        : cancelPowerAction.hovered
-                            ? Qt.lighter(theme ? theme.surface : "#313244", 1.15)
-                            : (theme ? theme.surface : "#313244")
-                    border.width: 1
-                    border.color: cancelPowerAction.visualFocus
-                        ? (theme ? theme.accent : "#cba6f7") : "transparent"
-                }
-                DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
-                Keys.onReturnPressed: powerConfirmation.reject()
-                Keys.onEnterPressed: powerConfirmation.reject()
-            }
-            Button {
-                id: confirmPowerButton
-                text: root.pendingPowerAction ? root.pendingPowerAction.label : "Confirm"
-                implicitWidth: Math.max(96, implicitContentWidth + 24)
-                implicitHeight: 36
-                contentItem: Text {
-                    text: confirmPowerButton.text
-                    color: theme ? theme.background : "#1e1e2e"
-                    font: confirmPowerButton.font
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    radius: 6
-                    color: confirmPowerButton.down
-                        ? Qt.darker(theme ? theme.accent : "#cba6f7", 1.15)
-                        : confirmPowerButton.hovered
-                            ? Qt.lighter(theme ? theme.accent : "#cba6f7", 1.1)
-                            : (theme ? theme.accent : "#cba6f7")
-                    border.width: 1
-                    border.color: confirmPowerButton.visualFocus
-                        ? (theme ? theme.text : "#cdd6f4") : "transparent"
-                }
-                DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
-                Keys.onReturnPressed: powerConfirmation.accept()
-                Keys.onEnterPressed: powerConfirmation.accept()
-            }
-            onAccepted: powerConfirmation.accept()
-            onRejected: powerConfirmation.reject()
-        }
-        onOpened: cancelPowerAction.forceActiveFocus()
-        onAccepted: root.confirmPowerAction()
-        onClosed: {
-            root.pendingPowerAction = null;
-            if (root.visible) searchInput.forceActiveFocus();
-        }
     }
 
     Rectangle {
