@@ -2,7 +2,7 @@
 
 A personal Linux desktop setup for Arch Linux, Hyprland, and Quickshell. This repository contains the desktop shell and configs for the terminal, prompt, system information tools, and lock screen.
 
-The setup is a work in progress. See [Todo](#todo) for known issues and [Roadmap](#roadmap) for planned features.
+The setup is a work in progress. See [Roadmap](#roadmap) for planned features.
 
 ## What's included
 
@@ -127,6 +127,25 @@ Quickshell starts automatically when a new Hyprland session starts. To start it 
 qs
 ```
 
+## Workspace assignments
+
+Edit `~/.config/hypr/modules/workspaces.lua` to choose which workspace numbers belong to each display. Its `displays` table defines the monitor name, workspace numbers, default workspace, and whether empty workspaces stay alive.
+
+The included preset assigns **1–5 to DP-1** (default **1**) and **6–10 to HDMI-A-1** (default **6**). Replace the monitor names with the outputs shown by `hyprctl monitors`. For example:
+
+```lua
+{
+    monitor = "DP-1",
+    workspaces = { 1, 3, 5 },
+    default = 1,
+    persistent = false,
+},
+```
+
+Each workspace number must belong to only one display, and its default must be included in that display's list. `persistent = true` keeps empty workspaces alive; `false` preserves dynamic workspaces. Numbers outside these lists use Hyprland's normal behavior. Assignments use [Hyprland workspace rules](https://wiki.hypr.land/configuring/core/rules/workspace-rules/).
+
+Run `hyprctl reload` after editing. Start a new Hyprland session to see each display's default starting workspace. The existing `Super + 1` through `Super + 0` shortcuts still target workspaces 1–10.
+
 ## Everyday controls
 
 `Super` is usually the Windows key. All bindings are defined in `hypr/modules/binds.lua`.
@@ -146,10 +165,6 @@ All power and session actions run immediately without a confirmation dialog.
 The notification center shows arrival timestamps. Use its **DND on/off** button to suppress notification popups while keeping them in history. Turning DND off resumes new popups without replaying earlier notifications.
 
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
-
-## Todo
-
-- Fix the Workspace order
 
 ## Roadmap
 

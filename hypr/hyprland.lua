@@ -1,6 +1,7 @@
 -- Main Hyprland configuration
 
 require("modules.monitors")
+require("modules.workspaces")
 require("modules.programs")
 require("modules.autostart")
 require("modules.environment")
