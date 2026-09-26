@@ -141,6 +141,8 @@ qs
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/lock` to lock the screen. It also provides `/shutdown`, `/reboot`, and `/logout` commands.
 
+Shutdown, restart, and logout require confirmation. Choose the action button to proceed, or press `Escape` to cancel. Cancel is focused by default; locking the screen remains immediate.
+
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
 
 ## Todo
