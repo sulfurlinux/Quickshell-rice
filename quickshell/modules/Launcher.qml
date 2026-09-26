@@ -10,6 +10,7 @@ PanelWindow {
     id: root
 
     property var theme
+    signal wallpaperSelected(string path)
     visible: false
 
     WlrLayershell.layer: WlrLayer.Overlay
@@ -442,19 +443,8 @@ print(json.dumps(res))
         if (shortcut) execCmd = shortcut.exec;
 
 
-        // Choose wallpaper – stores only the path; the Python Pillow script gets the actual color
         if (execCmd.startsWith("wallpaper_select:")) {
-            let imgPath = execCmd.replace("wallpaper_select:", "")
-            let pyScript = `
-import os
-img_path = "` + imgPath + `"
-cache_dir = os.path.expanduser('~/.cache')
-wp_file = os.path.join(cache_dir, 'quickshell_wallpaper.txt')
-with open(wp_file, 'w') as f:
-    f.write(img_path)
-`
-            execProcess.command = ["python3", "-c", pyScript]
-            execProcess.running = true
+            root.wallpaperSelected(execCmd.slice("wallpaper_select:".length))
             root.visible = false
             return;
         }

@@ -72,7 +72,7 @@ Edit the copied files in `~/.config` before loading the setup:
 | `hypr/modules/monitors.lua`                              | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs. |
 | `hypr/modules/autostart.lua` and `quickshell/shell.qml`  | The `DP-1` primary-monitor setting, if your output has a different name.                              |
 | `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications.                                          |
-| `quickshell/modules/Wallpaper.qml`                       | Uses your home directory automatically. Customize the default wallpaper filename here if needed.      |
+| `quickshell/modules/wallpaper.py`                        | Uses your home directory automatically. Customize the default wallpaper filename here if needed.      |
 | `fish/config.fish` and `fish/fish_variables`             | Remove or adapt the personal Spicetify paths if you do not use them.                                  |
 
 Create the user folders and the Python environment used by the wallpaper-color script:
@@ -84,6 +84,8 @@ python3 -m venv "$HOME/.cache/quickshell_venv"
 ```
 
 Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or choose an image from `/wallpaper` in the launcher. The saved selection is restored at startup; if no valid image is available, a solid background is shown.
+
+One selection updates every display. A single color extractor updates the Quickshell theme as soon as it finishes; selecting another wallpaper cancels the previous extraction and ignores stale results.
 
 Generate the initial theme files used by Quickshell and Hyprlock:
 

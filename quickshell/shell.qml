@@ -19,35 +19,57 @@ Scope {
         "accent": "#cba6f7"
     }
 
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: loadThemeProcess.running = true
+    property string selectedWallpaper: ""
+    property string wallpaperSource: ""
+    property bool wallpaperSelectionRequested: false
+    property string requestedWallpaper: ""
+    readonly property string wallpaperScript: decodeURIComponent(
+        Qt.resolvedUrl("modules/wallpaper.py").toString().replace(/^file:\/\//, ""))
+    readonly property string colorScript: decodeURIComponent(
+        Qt.resolvedUrl("modules/extract_color.py").toString().replace(/^file:\/\//, ""))
+
+    function applyWallpaperResult(data) {
+        try {
+            const result = JSON.parse(data);
+            if (root.wallpaperSelectionRequested && result.request !== root.requestedWallpaper) return;
+            root.selectedWallpaper = result.path;
+            root.wallpaperSource = result.source;
+            if (result.path) colorProcess.exec([
+                Quickshell.env("HOME") + "/.cache/quickshell_venv/bin/python3",
+                root.colorScript, result.path
+            ].concat(root.wallpaperSelectionRequested ? ["--selected"] : []));
+        } catch (error) { console.warn("Wallpaper: " + error); }
     }
 
     Process {
-        id: loadThemeProcess
-        command: ["python3", "-c", "
-import os, json
-path = os.path.expanduser('~/.cache/quickshell_theme.json')
-if os.path.exists(path):
-    try:
-        with open(path, 'r') as f:
-            print(f.read())
-    except:
-        print('')
-"]
+        running: true
+        command: ["python3", root.wallpaperScript, "restore"]
+        stdout: SplitParser {
+            onRead: data => {
+                if (!root.wallpaperSelectionRequested) root.applyWallpaperResult(data);
+            }
+        }
+        stderr: SplitParser { onRead: data => console.warn("Wallpaper: " + data) }
+    }
+
+    Process {
+        id: selectWallpaperProcess
+        stdout: SplitParser { onRead: data => root.applyWallpaperResult(data) }
+        stderr: SplitParser { onRead: data => console.warn("Wallpaper selection: " + data) }
+    }
+
+    Process {
+        id: colorProcess
         stdout: SplitParser {
             onRead: data => {
                 try {
-                    let parsed = JSON.parse(data.trim())
-                    if (parsed.accent) {
-                        root.currentTheme = parsed
-                    }
-                } catch(e) {}
+                    const result = JSON.parse(data);
+                    if (result.wallpaper === root.selectedWallpaper && result.theme.accent)
+                        root.currentTheme = result.theme;
+                } catch (error) { console.warn("Wallpaper theme: " + error); }
             }
         }
+        stderr: SplitParser { onRead: data => console.warn("Wallpaper theme: " + data) }
     }
 
     Rice.Screenshot {
@@ -56,6 +78,13 @@ if os.path.exists(path):
 
     Rice.Launcher {
         id: globalLauncher
+        onWallpaperSelected: path => {
+            root.wallpaperSelectionRequested = true;
+            root.requestedWallpaper = path;
+            root.selectedWallpaper = "";
+            colorProcess.running = false;
+            selectWallpaperProcess.exec(["python3", root.wallpaperScript, "select", path]);
+        }
         theme: root.currentTheme
     }
 
@@ -142,6 +171,7 @@ if os.path.exists(path):
 
         delegate: Component {
             Rice.Wallpaper {
+                wallpaperSource: root.wallpaperSource
                 required property var modelData
                 screen: modelData
             }

@@ -2,6 +2,7 @@
 import json
 import os
 import sys
+import tempfile
 
 
 def get_dominant_color(img_path):
@@ -12,24 +13,15 @@ def get_dominant_color(img_path):
         return "#cba6f7"
 
     try:
-        from PIL import Image
+        from PIL import Image, ImageStat
 
         with Image.open(img_path) as image:
+            image.draft("RGB", (100, 100))
+            image.thumbnail((50, 50), Image.Resampling.BILINEAR)
             image = image.convert("RGB")
-            image = image.resize((50, 50), Image.Resampling.LANCZOS)
-            pixels = list(image.getdata())
+            means = ImageStat.Stat(image).mean
 
-        if not pixels:
-            return "#cba6f7"
-
-        total_r = sum(pixel[0] for pixel in pixels)
-        total_g = sum(pixel[1] for pixel in pixels)
-        total_b = sum(pixel[2] for pixel in pixels)
-        count = len(pixels)
-
-        r = total_r // count
-        g = total_g // count
-        b = total_b // count
+        r, g, b = (int(channel) for channel in means)
 
         brightness = (r * 299 + g * 587 + b * 114) / 1000
 
@@ -46,8 +38,15 @@ def get_dominant_color(img_path):
         return "#cba6f7"
 
 
+def atomic_write(path, content):
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=os.path.dirname(path), delete=False) as file:
+        file.write(content)
+        temporary = file.name
+    os.replace(temporary, path)
+
+
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--selected"):
         print(f"Usage: {sys.argv[0]} <image-path>", file=sys.stderr)
         return 1
 
@@ -57,6 +56,11 @@ def main():
 
     cache_dir = os.path.expanduser("~/.cache")
     os.makedirs(cache_dir, exist_ok=True)
+
+    if len(sys.argv) == 3:
+        with open(os.path.join(cache_dir, "quickshell_wallpaper.txt"), encoding="utf-8") as file:
+            if file.read().strip() != clean_path:
+                return 0
 
     theme_data = {
         "background": "#1e1e2e",
@@ -68,23 +72,19 @@ def main():
 
     # Save the theme for Quickshell.
     theme_file = os.path.join(cache_dir, "quickshell_theme.json")
-    with open(theme_file, "w", encoding="utf-8") as file:
-        json.dump(theme_data, file)
+    atomic_write(theme_file, json.dumps(theme_data))
 
     # Save variables consumed by hyprlock.conf.
     hyprlock_conf = os.path.join(cache_dir, "hyprlock_colors.conf")
-    with open(hyprlock_conf, "w", encoding="utf-8") as file:
-        file.write(f"$accent = rgb({accent.lstrip('#')})\n")
-        file.write("$background = rgb(1e1e2e)\n")
-        file.write("$text = rgb(cdd6f4)\n")
+    atomic_write(hyprlock_conf, f"$accent = rgb({accent.lstrip('#')})\n"
+                 "$background = rgb(1e1e2e)\n$text = rgb(cdd6f4)\n")
 
     # Keep the wallpaper path separate from hyprlock.conf.
     # Write it atomically so hyprlock never sees a partially written file.
     wallpaper_conf = os.path.join(cache_dir, "hyprlock_wallpaper.conf")
-    wallpaper_tmp = f"{wallpaper_conf}.tmp"
-    with open(wallpaper_tmp, "w", encoding="utf-8") as file:
-        file.write(f"$wallpaper = {clean_path}\n")
-    os.replace(wallpaper_tmp, wallpaper_conf)
+    atomic_write(wallpaper_conf, f"$wallpaper = {clean_path}\n")
+
+    print(json.dumps({"wallpaper": clean_path, "theme": theme_data}))
 
     return 0
 
