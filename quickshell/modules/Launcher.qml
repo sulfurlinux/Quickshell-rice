@@ -288,7 +288,9 @@ PanelWindow {
     }
 
     function refreshWallpapers() {
-        if (wallpaperFolder.status !== FolderListModel.Ready) return;
+        // An empty folder URL may initially index the working directory.
+        // Do not mark that initial model as the loaded wallpaper list.
+        if (!root.wallpaperIndexStarted || wallpaperFolder.status !== FolderListModel.Ready) return;
         const entries = [];
         for (let i = 0; i < wallpaperFolder.count; i++) {
             entries.push({
@@ -315,6 +317,7 @@ PanelWindow {
         showHidden: true
         sortField: FolderListModel.Name
         onStatusChanged: Qt.callLater(root.refreshWallpapers)
+        onCountChanged: Qt.callLater(root.refreshWallpapers)
     }
 
     Connections {
@@ -408,8 +411,10 @@ else:
             }
             matched.push({ name: "← Back to commands", path: "", exec: "power_back", count: 0 });
         } else if (wallpaperQuery(query)) {
+            root.wallpaperIndexStarted = true;
             if (!wallpapersLoaded) {
-                root.wallpaperIndexStarted = true;
+                appListModel.append({ name: "Loading wallpapers…", path: "", exec: "", count: 0,
+                    clipboardImage: false, thumbnailKey: "" });
             } else {
                 const wallpaperFilter = query.slice("/wallpaper".length).trim();
                 for (let i = 0; i < wallpapers.length; i++) {
@@ -424,6 +429,12 @@ else:
                             thumbnailKey: ""
                         });
                     }
+                }
+                if (appListModel.count === 0) {
+                    appListModel.append({
+                        name: wallpapers.length === 0 ? "No wallpapers in ~/Pictures/Wallpapers" : "No matching wallpapers",
+                        path: "", exec: "", count: 0, clipboardImage: false, thumbnailKey: ""
+                    });
                 }
             }
             root.resetScroll()

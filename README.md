@@ -89,6 +89,8 @@ One selection updates every display. A single color extractor updates the Quicks
 
 Wallpaper images use Qt's shared image cache and a common decode size based on the active displays' physical resolution. Large source images are bounded to that size and loaded asynchronously.
 
+Wallpaper changes crossfade over 350 milliseconds once the next image has loaded. The current wallpaper stays visible during loading; rapid selections finish the current fade and then switch to the latest choice. The previous image is released after the transition.
+
 Wallpaper accents are cached for up to 128 images in `~/.cache/quickshell_wallpaper_colors.json`. Switching back to an unchanged image reuses its accent without importing Pillow or decoding the image. Modified or replaced files are recalculated automatically; the cache survives Quickshell restarts.
 
 Hyprland's active border gradient, muted inactive border, and shadow tint follow the same accent. Changes apply live through `hyprctl eval`; the saved palette in `~/.cache/hyprland_colors.txt` is restored by `hypr/modules/lookandfeel/theme.lua` on startup and configuration reload.
