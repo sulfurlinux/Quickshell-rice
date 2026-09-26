@@ -220,7 +220,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] Cava
   - [x] System resource usage
   - [x] Clock
-- [ ] Customize lockscreen / login screen
 - [x] Custom Spotify and Discord scratchpads
 - [x] Notification System
   - [x] Notification daemon
