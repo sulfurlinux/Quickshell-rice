@@ -166,7 +166,7 @@ PanelWindow {
                     id: spectrum
                     theme: root.theme
                     services: root.services
-                    visible: musicSpace.width >= 220 && root.services && root.services.cavaAvailable
+                    requested: root.visible && musicSpace.width >= 220
                 }
             }
         }

@@ -10,6 +10,17 @@ Scope {
     property string primaryMonitorName: "DP-1"
     readonly property var primaryScreen: Quickshell.screens.find(s => s.name === primaryMonitorName)
         ?? Quickshell.screens[0] ?? null
+    readonly property var displayScreens: showOnAllScreens
+        ? Quickshell.screens : (primaryScreen ? [primaryScreen] : [])
+    readonly property size wallpaperDecodeSize: {
+        let width = 1;
+        let height = 1;
+        for (const screen of root.displayScreens) {
+            width = Math.max(width, Math.ceil(screen.width * screen.devicePixelRatio));
+            height = Math.max(height, Math.ceil(screen.height * screen.devicePixelRatio));
+        }
+        return Qt.size(width, height);
+    }
 
     property var currentTheme: {
         "background": "#1e1e2e",
@@ -167,13 +178,12 @@ Scope {
     }
 
     Variants {
-        model: showOnAllScreens
-            ? Quickshell.screens
-            : (primaryScreen ? [primaryScreen] : [])
+        model: root.displayScreens
 
         delegate: Component {
             Rice.Wallpaper {
                 wallpaperSource: root.wallpaperSource
+                decodeSize: root.wallpaperDecodeSize
                 required property var modelData
                 screen: modelData
             }
@@ -181,9 +191,7 @@ Scope {
     }
 
     Variants {
-        model: showOnAllScreens
-            ? Quickshell.screens
-            : (primaryScreen ? [primaryScreen] : [])
+        model: root.displayScreens
 
         delegate: Component {
             Rice.Bar {

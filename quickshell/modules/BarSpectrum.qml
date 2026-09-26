@@ -4,7 +4,19 @@ Item {
     id: root
     property var theme
     property var services
-    visible: services !== null && services !== undefined && services.cavaAvailable
+    property bool requested: true
+    property var registeredServices: null
+    function syncDemand() {
+        if (registeredServices && registeredServices !== services)
+            registeredServices.setSpectrumDemand(root, false);
+        registeredServices = services || null;
+        if (registeredServices) registeredServices.setSpectrumDemand(root, requested);
+    }
+    onRequestedChanged: syncDemand()
+    onServicesChanged: syncDemand()
+    Component.onCompleted: syncDemand()
+    Component.onDestruction: if (registeredServices) registeredServices.setSpectrumDemand(root, false)
+    visible: requested && services !== null && services !== undefined && services.cavaAvailable
     implicitWidth: 70
     implicitHeight: 24
     Row {

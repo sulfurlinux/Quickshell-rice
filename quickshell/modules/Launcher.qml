@@ -36,6 +36,64 @@ PanelWindow {
     property var clipboardThumbnails: ({})
     property string clipboardDatabaseKey: ""
     readonly property string clipboardPreviewPython: Quickshell.env("HOME") + "/.cache/quickshell_venv/bin/python3"
+    property var thumbnailQueue: []
+    property var thumbnailRequest: null
+    property bool thumbnailWorkerReady: false
+
+    function requestClipboardThumbnail(identifier, key) {
+        if (root.clipboardThumbnails[key]
+            || (root.thumbnailRequest && root.thumbnailRequest.key === key
+                && root.thumbnailRequest.database === root.clipboardDatabaseKey)
+            || root.thumbnailQueue.some(request => request.key === key
+                && request.database === root.clipboardDatabaseKey)) return;
+        root.thumbnailQueue = root.thumbnailQueue.concat([{
+            id: identifier, key: key, database: root.clipboardDatabaseKey
+        }]);
+        root.pumpThumbnailQueue();
+    }
+
+    function pumpThumbnailQueue() {
+        if (root.thumbnailRequest || !root.visible || !root.inClipboardMenu) return;
+        root.thumbnailQueue = root.thumbnailQueue.filter(request =>
+            request.database === root.clipboardDatabaseKey && !root.clipboardThumbnails[request.key]
+            && root.clipboardEntries.some(entry => root.thumbnailKey(entry) === request.key));
+        if (root.thumbnailQueue.length === 0) return;
+        if (!thumbnailWorker.running) {
+            thumbnailWorker.running = true;
+            return;
+        }
+        if (!root.thumbnailWorkerReady) return;
+        root.thumbnailRequest = root.thumbnailQueue[0];
+        root.thumbnailQueue = root.thumbnailQueue.slice(1);
+        thumbnailWorker.write(JSON.stringify(root.thumbnailRequest) + "\n");
+    }
+
+    Process {
+        id: thumbnailWorker
+        command: [root.clipboardPreviewPython, "-u", root.clipboardScript, "preview-worker"]
+        stdinEnabled: true
+        onStarted: {
+            root.thumbnailWorkerReady = true;
+            root.pumpThumbnailQueue();
+        }
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const result = JSON.parse(data);
+                    root.rememberClipboardThumbnail(result.key, result.source, result.database);
+                } catch (error) { console.warn("Clipboard thumbnail worker: " + error); }
+                root.thumbnailRequest = null;
+                root.pumpThumbnailQueue();
+            }
+        }
+        stderr: SplitParser { onRead: data => console.warn("Clipboard thumbnail worker: " + data) }
+        onExited: (exitCode, exitStatus) => {
+            root.thumbnailWorkerReady = false;
+            root.thumbnailRequest = null;
+            root.thumbnailQueue = [];
+            if (exitCode !== 0) console.warn("Clipboard thumbnail worker stopped (exit " + exitCode + ")");
+        }
+    }
 
     function thumbnailKey(entry) {
         return entry.id + ":" + entry.preview;
@@ -72,6 +130,7 @@ PanelWindow {
     readonly property string clipboardScript: decodeURIComponent(
         Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
     readonly property bool inClipboardMenu: /^\/clipboard(?:\s|$)/.test(searchInput.text.toLowerCase().trim())
+    onInClipboardMenuChanged: if (!inClipboardMenu) root.thumbnailQueue = []
     readonly property int resultsHeight: {
         let total = 0;
         for (let i = 0; i < appListModel.count; i++) {
@@ -531,6 +590,8 @@ with open(path, 'w') as f:
             Qt.callLater(() => {
                 if (root.visible) searchInput.forceActiveFocus();
             })
+        } else {
+            root.thumbnailQueue = [];
         }
     }
 
@@ -642,24 +703,9 @@ with open(path, 'w') as f:
 
                     readonly property bool hasClipboardImage: model.clipboardImage === true
                     readonly property string clipboardImageSource: root.clipboardThumbnails[model.thumbnailKey] || ""
-                    property string thumbnailDatabase: ""
-
                     Component.onCompleted: {
-                        thumbnailDatabase = root.clipboardDatabaseKey;
-                        if (hasClipboardImage && !clipboardImageSource) thumbnailProcess.running = true;
-                    }
-
-                    Process {
-                        id: thumbnailProcess
-                        command: [root.clipboardPreviewPython, root.clipboardScript, "preview",
-                            model.exec.slice("clipboard_copy:".length)]
-                        stdout: SplitParser {
-                            onRead: data => {
-                                try { root.rememberClipboardThumbnail(model.thumbnailKey, JSON.parse(data).source, thumbnailDatabase); }
-                                catch (error) { console.warn("Clipboard thumbnail: " + error); }
-                            }
-                        }
-                        stderr: SplitParser { onRead: data => console.warn("Clipboard thumbnail: " + data) }
+                        if (hasClipboardImage && !clipboardImageSource)
+                            root.requestClipboardThumbnail(model.exec.slice("clipboard_copy:".length), model.thumbnailKey);
                     }
 
                     width: appList.width

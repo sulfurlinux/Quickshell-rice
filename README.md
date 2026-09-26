@@ -87,6 +87,8 @@ Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or choose an image fro
 
 One selection updates every display. A single color extractor updates the Quickshell theme as soon as it finishes; selecting another wallpaper cancels the previous extraction and ignores stale results.
 
+Wallpaper images use Qt's shared image cache and a common decode size based on the active displays' physical resolution. Large source images are bounded to that size and loaded asynchronously.
+
 Wallpaper accents are cached for up to 128 images in `~/.cache/quickshell_wallpaper_colors.json`. Switching back to an unchanged image reuses its accent without importing Pillow or decoding the image. Modified or replaced files are recalculated automatically; the cache survives Quickshell restarts.
 
 Hyprland's active border gradient, muted inactive border, and shadow tint follow the same accent. Changes apply live through `hyprctl eval`; the saved palette in `~/.cache/hyprland_colors.txt` is restored by `hypr/modules/lookandfeel/theme.lua` on startup and configuration reload.
@@ -185,7 +187,7 @@ After copying the updated configs, restart Quickshell to enable recording in the
 
 History is refreshed each time you open the clipboard submenu. Entries are shown newest first; search narrows the list to at most 49 matches.
 
-Image previews use Pillow from the same `~/.cache/quickshell_venv` environment as wallpaper colors. Up to 64 small thumbnails are cached in memory while Quickshell runs, so reopening history avoids decoding those images again. Removed entries are pruned, and replacing the history database invalidates the cache. Copying still uses the original image bytes.
+Image previews use Pillow from the same `~/.cache/quickshell_venv` environment as wallpaper colors. One worker processes uncached previews sequentially instead of starting Python for every image. Up to 64 small thumbnails are cached in memory while Quickshell runs, so reopening history avoids decoding those images again. Removed entries are pruned, and replacing the history database invalidates the cache. Copying still uses the original image bytes.
 
 ### Bar
 
@@ -197,7 +199,7 @@ The music section shows the active MPRIS player's track and artist, with previou
 
 Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. The spectrum is hidden when the space between the clock and audio controls is too narrow.
 
-CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process; errors appear in the Quickshell logs.
+CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process. Cava stops when no visible bar has room for its spectrum and restarts when space becomes available. Errors appear in the Quickshell logs.
 
 ### Notifications and screenshots
 

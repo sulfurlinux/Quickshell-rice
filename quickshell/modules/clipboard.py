@@ -25,10 +25,52 @@ def database_key():
     return ""
 
 
+def thumbnail_source(identifier):
+    result = subprocess.run(
+        ["cliphist", "decode"], input=(identifier + "\t\n").encode(),
+        check=True, capture_output=True, timeout=5,
+    )
+    from PIL import Image
+    with Image.open(BytesIO(result.stdout)) as image:
+        image.draft("RGB", (256, 144))
+        image.thumbnail((128, 72), Image.Resampling.BILINEAR)
+        thumbnail = image.convert("RGBA")
+        output = BytesIO()
+        thumbnail.save(output, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(output.getvalue()).decode("ascii")
+
+
+def preview_worker():
+    for line in sys.stdin:
+        request = {}
+        try:
+            request = json.loads(line)
+            if not isinstance(request, dict):
+                raise ValueError("Invalid thumbnail request")
+            identifier = request.get("id", "")
+            if not isinstance(identifier, str) or not identifier.isdecimal():
+                raise ValueError("Invalid clipboard ID")
+            source = thumbnail_source(identifier)
+            error = ""
+        except Exception as failure:
+            source = ""
+            error = str(failure)
+            print(f"Clipboard thumbnail: {failure}", file=sys.stderr, flush=True)
+            if isinstance(failure, subprocess.CalledProcessError) and failure.stderr:
+                print(failure.stderr.decode("utf-8", errors="replace"), file=sys.stderr, flush=True)
+            if not isinstance(request, dict):
+                request = {}
+        print(json.dumps({"key": request.get("key", ""), "database": request.get("database", ""),
+                          "source": source, "error": error}), flush=True)
+    return 0
+
+
 def main():
     action = sys.argv[1] if len(sys.argv) > 1 else ""
     try:
-        if action == "list":
+        if action == "preview-worker":
+            return preview_worker()
+        elif action == "list":
             result = subprocess.run(["cliphist", "list"], capture_output=True)
             if result.returncode:
                 detail = result.stderr.decode("utf-8", errors="replace").strip()
@@ -54,19 +96,7 @@ def main():
                     })
             print(json.dumps({"entries": entries, "error": "", "databaseKey": database_key()}))
         elif action == "preview" and len(sys.argv) == 3 and sys.argv[2].isdecimal():
-            result = subprocess.run(
-                ["cliphist", "decode"], input=(sys.argv[2] + "\t\n").encode(),
-                check=True, capture_output=True,
-            )
-            from PIL import Image
-            with Image.open(BytesIO(result.stdout)) as image:
-                image.draft("RGB", (256, 144))
-                image.thumbnail((128, 72), Image.Resampling.BILINEAR)
-                thumbnail = image.convert("RGBA")
-                output = BytesIO()
-                thumbnail.save(output, format="PNG")
-            print(json.dumps({"source": "data:image/png;base64,"
-                              + base64.b64encode(output.getvalue()).decode("ascii")}))
+            print(json.dumps({"source": thumbnail_source(sys.argv[2])}))
         elif action == "copy" and len(sys.argv) == 3 and sys.argv[2].isdecimal():
             result = subprocess.run(
                 ["cliphist", "decode"], input=(sys.argv[2] + "\t\n").encode(),

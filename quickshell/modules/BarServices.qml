@@ -20,6 +20,14 @@ Scope {
     property var resources: null
     property var spectrum: []
     property bool cavaAvailable: false
+    property var spectrumConsumers: []
+    readonly property bool spectrumWanted: spectrumConsumers.length > 0
+
+    function setSpectrumDemand(viewer, wanted) {
+        const consumers = root.spectrumConsumers.filter(candidate => candidate && candidate !== viewer);
+        if (wanted) consumers.push(viewer);
+        root.spectrumConsumers = consumers;
+    }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
     readonly property var sinkAudio: sink && sink.ready ? sink.audio : null
@@ -63,7 +71,7 @@ Scope {
     }
 
     Process {
-        running: true
+        running: root.spectrumWanted
         command: ["cava", "-p", decodeURIComponent(
             Qt.resolvedUrl("cava-bar.conf").toString().replace(/^file:\/\//, ""))]
         stdout: SplitParser {
@@ -78,7 +86,7 @@ Scope {
         onExited: (exitCode, exitStatus) => {
             root.cavaAvailable = false;
             root.spectrum = [];
-            console.warn("Bar Cava stopped (exit " + exitCode + ")");
+            if (root.spectrumWanted) console.warn("Bar Cava stopped (exit " + exitCode + ")");
         }
     }
 }
