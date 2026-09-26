@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
@@ -21,21 +20,18 @@ Rectangle {
         BarButton {
             theme: root.theme
             label: "󰒮"
-            hint: "Previous track"
             enabled: root.player !== null && root.player.canGoPrevious
             onClicked: if (root.player && root.player.canGoPrevious) root.player.previous()
         }
         BarButton {
             theme: root.theme
             label: root.player && root.player.isPlaying ? "󰏤" : "󰐊"
-            hint: "Play / pause"
             enabled: root.player !== null && root.player.canTogglePlaying
             onClicked: if (root.player && root.player.canTogglePlaying) root.player.togglePlaying()
         }
         BarButton {
             theme: root.theme
             label: "󰒭"
-            hint: "Next track"
             enabled: root.player !== null && root.player.canGoNext
             onClicked: if (root.player && root.player.canGoNext) root.player.next()
         }
@@ -52,17 +48,12 @@ Rectangle {
             MouseArea {
                 id: trackPointer
                 anchors.fill: parent
-                hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: mouse => {
                     if (mouse.button === Qt.RightButton) root.services.cyclePlayer();
                     else if (root.player && root.player.canRaise) root.player.raise();
                 }
             }
-            ToolTip.visible: trackPointer.containsMouse
-            ToolTip.text: track.text + "\n" + (root.player ? root.player.identity : "")
-                + "\nClick to open player · Right-click to switch player"
-            ToolTip.delay: 500
         }
     }
 }

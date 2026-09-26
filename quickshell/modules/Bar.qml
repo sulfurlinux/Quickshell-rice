@@ -202,7 +202,6 @@ PanelWindow {
                 BarResources {
                     theme: root.theme
                     services: root.services
-                    showDisk: root.width >= 1200
                 }
 
                 Rectangle {

@@ -189,7 +189,7 @@ The music section shows the active MPRIS player's track and artist, with previou
 
 Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. On displays narrower than 1000 logical pixels, the spectrum is hidden to leave room for controls.
 
-CPU and RAM percentages refresh every two seconds. Disk usage for `/` also appears on displays at least 1200 logical pixels wide. Hover over the resource readings for used/total RAM and disk space. All displays share one resource monitor and one Cava process; errors appear in the Quickshell logs.
+CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process; errors appear in the Quickshell logs.
 
 ### Notifications and screenshots
 

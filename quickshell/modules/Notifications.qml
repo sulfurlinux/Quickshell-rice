@@ -288,8 +288,6 @@ Scope {
                         implicitWidth: implicitContentWidth + 20
                         implicitHeight: 28
                         Accessible.name: "Do not disturb"
-                        ToolTip.visible: hovered
-                        ToolTip.text: "Hide notification popups; keep notifications in history"
 
                         contentItem: Text {
                             text: dndButton.text
@@ -307,7 +305,7 @@ Scope {
                                 ? (root.theme ? root.theme.accent : "#cba6f7")
                                 : (root.theme ? root.theme.surface : "#313244")
                             border.width: 1
-                            border.color: dndButton.visualFocus || dndButton.hovered
+                            border.color: dndButton.visualFocus
                                 ? (root.theme ? root.theme.text : "#cdd6f4") : "transparent"
                         }
                     }

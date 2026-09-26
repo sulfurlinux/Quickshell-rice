@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Stream Linux CPU, memory and root-filesystem usage for all bars."""
+"""Stream Linux CPU and memory usage for all bars."""
 import json
 from pathlib import Path
-import shutil
 import sys
 import time
 
@@ -29,15 +28,11 @@ def main():
             available = memory.get("MemAvailable", memory.get("MemFree", 0))
             memory_total = memory["MemTotal"]
             used = memory_total - available
-            disk = shutil.disk_usage("/")
             print(json.dumps({
                 "cpu": round(max(0, min(100, cpu))),
                 "memory": round(100 * used / memory_total),
                 "memoryUsedGiB": round(used / 1024 ** 3, 1),
                 "memoryTotalGiB": round(memory_total / 1024 ** 3, 1),
-                "disk": round(100 * disk.used / disk.total),
-                "diskUsedGiB": round(disk.used / 1024 ** 3, 1),
-                "diskTotalGiB": round(disk.total / 1024 ** 3, 1),
             }), flush=True)
             time.sleep(2)
     except (OSError, ValueError, KeyError, ZeroDivisionError) as error:
