@@ -212,6 +212,7 @@ PanelWindow {
             BarResources {
                 theme: root.theme
                 services: root.services
+                Layout.rightMargin: 8
             }
 
             Rectangle {
