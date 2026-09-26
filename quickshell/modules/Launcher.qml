@@ -86,6 +86,7 @@ PanelWindow {
     Process {
         id: loadClipboardProcess
         command: ["python3", root.clipboardScript, "list"]
+        stderr: SplitParser { onRead: data => console.warn("Clipboard: " + data) }
         stdout: SplitParser {
             onRead: data => {
                 try {
@@ -96,7 +97,7 @@ PanelWindow {
                     if (root.inClipboardMenu) root.filterApps();
                 } catch (error) {
                     root.clipboardLoaded = true;
-                    root.clipboardError = "Could not read clipboard history";
+                    root.clipboardError = "History unavailable — see qs logs";
                     if (root.inClipboardMenu) root.filterApps();
                     console.warn("Could not read clipboard history: " + error);
                 }
@@ -105,7 +106,8 @@ PanelWindow {
         onExited: (exitCode, exitStatus) => {
             if (exitCode !== 0) {
                 root.clipboardLoaded = true;
-                root.clipboardError = "Could not load clipboard history";
+                root.clipboardError = "History unavailable — see qs logs";
+                console.warn("Clipboard history process exited with code " + exitCode);
                 if (root.inClipboardMenu) root.filterApps();
             }
         }
@@ -117,7 +119,7 @@ PanelWindow {
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0) root.visible = false;
             else {
-                root.clipboardError = "Could not restore clipboard entry";
+                root.clipboardError = "Copy failed — see qs logs";
                 if (root.inClipboardMenu) root.filterApps();
             }
         }

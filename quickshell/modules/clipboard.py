@@ -12,7 +12,11 @@ def main():
             result = subprocess.run(["cliphist", "list"], capture_output=True)
             if result.returncode:
                 detail = result.stderr.decode("utf-8", errors="replace").strip()
-                if "opening db:" in detail and "no such file or directory" in detail.lower():
+                detail_lower = detail.lower()
+                if "opening db:" in detail_lower and (
+                    "please store something first" in detail_lower
+                    or "no such file or directory" in detail_lower
+                ):
                     print(json.dumps({"entries": [], "error": ""}))
                     return 0
                 result.check_returncode()
@@ -37,11 +41,12 @@ def main():
             detail = (error.stderr or b"").decode("utf-8", errors="replace").strip()
             message = f"Clipboard command failed: {error.cmd[0]} (exit {error.returncode})"
             if detail:
-                message += ": " + " ".join(detail.split())
+                message += ":\n" + detail
         else:
             message = str(error)
         if action == "list":
-            print(json.dumps({"entries": [], "error": message}))
+            print(message, file=sys.stderr)
+            print(json.dumps({"entries": [], "error": "History unavailable — see qs logs"}))
         else:
             print(message, file=sys.stderr)
             return 1
