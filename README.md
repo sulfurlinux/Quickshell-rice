@@ -29,7 +29,7 @@ Install the applications used by the setup, plus screenshot, audio, brightness, 
 ```bash
 sudo pacman -S --needed quickshell ghostty hyprlock fish fastfetch \
   ttf-jetbrains-mono-nerd nautilus zed starship firefox \
-  grim slurp wl-clipboard wireplumber brightnessctl playerctl python \
+  grim slurp hyprpicker wl-clipboard util-linux wireplumber brightnessctl playerctl python \
   xorg-xrandr git base-devel
 ```
 
@@ -141,13 +141,13 @@ qs
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/lock` to lock the screen. It also provides `/shutdown`, `/reboot`, and `/logout` commands.
 
+Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
+
 ## Todo
 
 - Add timestamps and a do not disturb to the notification center
 - Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
-- Freeze the screen when Screenshotting
-- Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
 - make the louncher icons use the text color
 - Fix the Launcher Scaling

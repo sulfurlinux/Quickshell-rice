@@ -2,36 +2,37 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-QtObject {
+Scope {
     id: root
 
     readonly property string screenshotDir: Quickshell.env("HOME") + "/Pictures/Screenshots"
 
-    function timestamp() {
-        return Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss")
+    readonly property bool busy: captureProcess.running
+
+    function capture(target, action) {
+        // Key repeats must not create more selectors or frozen backgrounds.
+        if (busy) return;
+
+        const script = Qt.resolvedUrl("screenshot.sh").toString();
+        captureProcess.command = ["bash", decodeURIComponent(script.replace(/^file:\/\//, "")),
+            target, action, screenshotDir];
+        captureProcess.running = true;
     }
 
-    function run(command) {
-        Quickshell.execDetached(command)
-    }
+    function fullScreen() { capture("screen", "save"); }
+    function selectArea() { capture("area", "save"); }
+    function fullScreenClipboard() { capture("screen", "copy"); }
+    function selectAreaClipboard() { capture("area", "copy"); }
+    function selectAreaSaveAndCopy() { capture("area", "copysave"); }
 
-    function fullScreen() {
-        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && grim \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\""])
-    }
-
-    function selectArea() {
-        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\""])
-    }
-
-    function fullScreenClipboard() {
-        run(["sh", "-c", "grim - | wl-copy --type image/png"])
-    }
-
-    function selectAreaClipboard() {
-        run(["sh", "-c", "geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" - | wl-copy --type image/png"])
-    }
-
-    function selectAreaSaveAndCopy() {
-        run(["sh", "-c", "mkdir -p \"$HOME/Pictures/Screenshots\" && geometry=$(slurp) && [ -n \"$geometry\" ] && grim -g \"$geometry\" \"$HOME/Pictures/Screenshots/Screenshot_" + timestamp() + ".png\" && grim -g \"$geometry\" - | wl-copy --type image/png"])
+    Process {
+        id: captureProcess
+        stderr: SplitParser {
+            onRead: data => console.warn("Screenshot: " + data)
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0 && exitCode !== 130)
+                console.warn("Screenshot failed (exit " + exitCode + ").");
+        }
     }
 }
