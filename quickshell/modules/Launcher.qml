@@ -36,6 +36,71 @@ PanelWindow {
         if (root.visible && !searchInput.text.trim().startsWith("/")) root.filterApps();
     }
     property var appHistory: ({})
+    property string lastFilterQuery: ""
+    property bool historyReady: false
+    property bool historySaving: false
+    property bool historyDirty: false
+    property var pendingHistory: ({})
+
+    FileView {
+        id: historyFile
+        path: Quickshell.env("HOME") + "/.cache/quickshell_app_history.json"
+        printErrors: false
+        atomicWrites: true
+        onLoaded: {
+            let history = {};
+            try {
+                const parsed = JSON.parse(historyFile.text());
+                if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+                    for (const name of Object.keys(parsed)) {
+                        if (Number.isSafeInteger(parsed[name]) && parsed[name] >= 0)
+                            history[name] = parsed[name];
+                    }
+                }
+            } catch (error) { console.warn("Launcher history: invalid JSON: " + error); }
+            root.acceptHistory(history);
+        }
+        onLoadFailed: root.acceptHistory({})
+        onSaved: {
+            root.historySaving = false;
+            root.saveHistory();
+        }
+        onSaveFailed: error => {
+            root.historySaving = false;
+            root.historyDirty = true;
+            console.warn("Launcher history: save failed (" + error + ")");
+        }
+    }
+
+    function acceptHistory(history) {
+        for (const name of Object.keys(root.pendingHistory))
+            history[name] = (history[name] || 0) + root.pendingHistory[name];
+        root.pendingHistory = {};
+        root.appHistory = history;
+        root.historyReady = true;
+        root.saveHistory();
+        if (root.visible && !searchInput.text.trim().startsWith("/")) root.filterApps();
+    }
+
+    function recordAppLaunch(name) {
+        const history = Object.assign({}, root.appHistory);
+        history[name] = (history[name] || 0) + 1;
+        root.appHistory = history;
+        if (!root.historyReady) {
+            const pending = Object.assign({}, root.pendingHistory);
+            pending[name] = (pending[name] || 0) + 1;
+            root.pendingHistory = pending;
+        }
+        root.historyDirty = true;
+        root.saveHistory();
+    }
+
+    function saveHistory() {
+        if (!root.historyReady || root.historySaving || !root.historyDirty) return;
+        root.historyDirty = false;
+        root.historySaving = true;
+        historyFile.setText(JSON.stringify(root.appHistory));
+    }
     property var wallpapers: []
     property bool wallpapersLoaded: false
     property bool wallpaperIndexStarted: false
@@ -177,8 +242,35 @@ PanelWindow {
         id: appListModel
     }
 
+    function resultKey(row) {
+        return row.exec || row.name;
+    }
+
+    function updateResults(results) {
+        const keys = results.map(root.resultKey);
+        for (let i = appListModel.count - 1; i >= 0; i--) {
+            if (!keys.includes(root.resultKey(appListModel.get(i)))) appListModel.remove(i);
+        }
+        for (let i = 0; i < results.length; i++) {
+            const row = Object.assign({ path: "", count: 0, clipboardImage: false, thumbnailKey: "" }, results[i]);
+            let existing = i;
+            while (existing < appListModel.count
+                && root.resultKey(appListModel.get(existing)) !== keys[i]) existing++;
+            if (existing === appListModel.count) {
+                appListModel.insert(i, row);
+            } else {
+                if (existing !== i) appListModel.move(existing, i, 1);
+                for (const role of Object.keys(row)) {
+                    if (appListModel.get(i)[role] !== row[role]) appListModel.setProperty(i, role, row[role]);
+                }
+            }
+        }
+        if (appListModel.count > results.length)
+            appListModel.remove(results.length, appListModel.count - results.length);
+    }
+
     Process { id: execProcess }
-    Process { id: saveHistoryProcess }
+
 
     Process {
         id: loadRunningAppsProcess
@@ -328,34 +420,8 @@ PanelWindow {
         function onDataChanged() { Qt.callLater(root.refreshWallpapers); }
     }
 
-    Process {
-        id: loadHistoryProcess
-        command: ["python3", "-c", "
-import json, os
-path = os.path.expanduser('~/.cache/quickshell_app_history.json')
-if os.path.exists(path):
-    try:
-        with open(path, 'r') as f:
-            print(f.read())
-    except:
-        print('{}')
-else:
-    print('{}')
-"]
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    root.appHistory = JSON.parse(data.trim())
-                    if (!searchInput.text.trim().startsWith("/")) root.filterApps()
-                } catch(e) {
-                    root.appHistory = {}
-                }
-            }
-        }
-    }
-
     function filterApps() {
-        appListModel.clear()
+
         let query = searchInput.text.toLowerCase().trim()
 
         let matched = []
@@ -413,14 +479,14 @@ else:
         } else if (wallpaperQuery(query)) {
             root.wallpaperIndexStarted = true;
             if (!wallpapersLoaded) {
-                appListModel.append({ name: "Loading wallpapers…", path: "", exec: "", count: 0,
+                matched.push({ name: "Loading wallpapers…", path: "", exec: "", count: 0,
                     clipboardImage: false, thumbnailKey: "" });
             } else {
                 const wallpaperFilter = query.slice("/wallpaper".length).trim();
                 for (let i = 0; i < wallpapers.length; i++) {
                     const wallpaper = wallpapers[i];
                     if (wallpaper.name.toLowerCase().includes(wallpaperFilter)) {
-                        appListModel.append({
+                        matched.push({
                             name: wallpaper.name,
                             path: wallpaper.path,
                             exec: wallpaper.exec,
@@ -430,15 +496,13 @@ else:
                         });
                     }
                 }
-                if (appListModel.count === 0) {
-                    appListModel.append({
+                if (matched.length === 0) {
+                    matched.push({
                         name: wallpapers.length === 0 ? "No wallpapers in ~/Pictures/Wallpapers" : "No matching wallpapers",
                         path: "", exec: "", count: 0, clipboardImage: false, thumbnailKey: ""
                     });
                 }
             }
-            root.resetScroll()
-            return;
         } else if (query.startsWith("/")) {
             for (let i = 0; i < systemCommands.length; i++) {
                 let cmd = systemCommands[i]
@@ -473,14 +537,9 @@ else:
             })
         }
 
-        let limit = Math.min(matched.length, 50)
-        for (let i = 0; i < limit; i++) {
-            matched[i].clipboardImage = matched[i].clipboardImage === true;
-            matched[i].thumbnailKey = matched[i].thumbnailKey || "";
-            appListModel.append(matched[i])
-        }
-
-        root.resetScroll()
+        root.updateResults(wallpaperQuery(query) ? matched : matched.slice(0, 50));
+        if (query !== root.lastFilterQuery) root.resetScroll();
+        root.lastFilterQuery = query;
     }
 
     function launchApp(appName, execCmd) {
@@ -541,21 +600,7 @@ else:
         }
 
         if (!execCmd.startsWith("systemctl") && !execCmd.startsWith("loginctl") && !execCmd.startsWith("hyprlock")) {
-            let pureAppName = appName.split(" — ")[0]
-            if (!root.appHistory[pureAppName]) {
-                root.appHistory[pureAppName] = 0
-            }
-            root.appHistory[pureAppName]++
-
-            let historyJson = JSON.stringify(root.appHistory)
-            saveHistoryProcess.command = ["python3", "-c", "
-import json, os
-path = os.path.expanduser('~/.cache/quickshell_app_history.json')
-os.makedirs(os.path.dirname(path), exist_ok=True)
-with open(path, 'w') as f:
-    f.write('" + historyJson.replace(/'/g, "\\'") + "')
-"]
-            saveHistoryProcess.running = true
+            root.recordAppLaunch(appName.split(" — ")[0]);
         }
 
         if (execCmd.startsWith("desktop_entry:")) {
@@ -583,7 +628,6 @@ with open(path, 'w') as f:
             root.runningAppsLoaded = false
             root.runningAppsError = ""
             searchInput.text = ""
-            loadHistoryProcess.running = true
             filterApps()
             root.resetScroll()
             Qt.callLater(() => {
@@ -691,6 +735,7 @@ with open(path, 'w') as f:
                 clip: true
                 spacing: 6
                 model: appListModel
+                reuseItems: true
                 currentIndex: -1
                 boundsBehavior: Flickable.StopAtBounds
                 keyNavigationEnabled: false
@@ -702,9 +747,22 @@ with open(path, 'w') as f:
 
                     readonly property bool hasClipboardImage: model.clipboardImage === true
                     readonly property string clipboardImageSource: root.clipboardThumbnails[model.thumbnailKey] || ""
-                    Component.onCompleted: {
-                        if (hasClipboardImage && !clipboardImageSource)
+                    readonly property string previewKey: model.thumbnailKey
+                    property bool pooled: false
+                    function refreshPreview() {
+                        if (!pooled && hasClipboardImage && !clipboardImageSource)
                             root.requestClipboardThumbnail(model.exec.slice("clipboard_copy:".length), model.thumbnailKey);
+                    }
+                    Component.onCompleted: Qt.callLater(refreshPreview)
+                    onPreviewKeyChanged: Qt.callLater(refreshPreview)
+                    onHasClipboardImageChanged: Qt.callLater(refreshPreview)
+                    onClipboardImageSourceChanged: {
+                        if (!clipboardImageSource) Qt.callLater(refreshPreview);
+                    }
+                    ListView.onPooled: pooled = true
+                    ListView.onReused: {
+                        pooled = false;
+                        Qt.callLater(refreshPreview);
                     }
 
                     width: appList.width

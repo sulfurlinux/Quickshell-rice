@@ -173,6 +173,8 @@ Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallp
 
 The launcher reuses [Quickshell's desktop entry registry](https://quickshell.org/docs/v0.2.1/types/Quickshell/DesktopEntries/), which updates when desktop files change. Wallpaper lists are indexed on first use and kept current by [Qt's folder watcher](https://doc.qt.io/qt-6/qml-qt-labs-folderlistmodel-folderlistmodel.html). Reopening the launcher or wallpaper menu does not start Python to rebuild these lists.
 
+Search updates only changed result rows, and scrolling reuses row components. Clipboard previews refresh when reused rows change entries. App usage history is loaded once per Quickshell session and saved asynchronously with atomic writes through [FileView](https://quickshell.org/docs/v0.2.1/types/Quickshell.Io/FileView/), without starting Python. The existing `~/.cache/quickshell_app_history.json` file and usage ranking are preserved.
+
 Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
 
 All power and session actions run immediately without a confirmation dialog.
