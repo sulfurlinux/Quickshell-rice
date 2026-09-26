@@ -10,7 +10,6 @@ Scope {
     readonly property bool busy: captureProcess.running
 
     function capture(target, action) {
-        // Key repeats must not create more selectors or frozen backgrounds.
         if (busy) return;
 
         const script = Qt.resolvedUrl("screenshot.sh").toString();

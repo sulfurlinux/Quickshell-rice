@@ -1,5 +1,4 @@
 -- Window rules.
--- Screenshot layers must disappear immediately before grim captures the frame.
 hl.layer_rule({
     match = { namespace = "^(selection|hyprpicker)$" },
     no_anim = true,

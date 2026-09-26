@@ -17,7 +17,6 @@ for tool in "${required[@]}"; do
 done
 
 runtime=${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}
-# Never unlink the lock file: another process could then lock a different inode.
 exec 9>"$runtime/quickshell-screenshot-${UID}.lock"
 flock -n 9 || exit 0
 
@@ -42,8 +41,6 @@ workdir=$(mktemp -d "$runtime/quickshell-screenshot.XXXXXX")
 
 geometry=()
 if [[ $target == area ]]; then
-    # Same freeze mechanism as grimblast; keep the backdrop until grim finishes.
-    # Close the lock descriptor in children so clipboard ownership cannot hold it.
     hyprpicker -r -z >"$workdir/picker.log" 2>&1 9>&- &
     picker_pid=$!
     sleep 0.2

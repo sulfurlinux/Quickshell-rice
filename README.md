@@ -148,9 +148,7 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - Add timestamps and a do not disturb to the notification center
 - Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
-- Fix the Launcher buging when the cursor is inside the window
 - make the louncher icons use the text color
-- Fix the Launcher Scaling
 
 ## Roadmap
 

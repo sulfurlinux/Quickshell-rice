@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 
 PanelWindow {
     id: root
@@ -12,7 +13,8 @@ PanelWindow {
     visible: false
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    exclusionMode: ExclusionMode.Ignore
 
     anchors {
         top: true
@@ -24,7 +26,25 @@ PanelWindow {
     color: "transparent"
 
     property var allApps: []
-    property var appHistory: {}
+    property var appHistory: ({})
+    property var wallpapers: []
+    property bool wallpapersLoaded: false
+    readonly property int resultsHeight: {
+        let total = 0;
+        for (let i = 0; i < appListModel.count; i++) {
+            const result = appListModel.get(i);
+            total += result.path ? 48 : 40;
+        }
+        return total + Math.max(0, appListModel.count - 1) * appList.spacing;
+    }
+
+    function focusScreen() {
+        const monitor = Hyprland.focusedMonitor;
+        const focusedScreen = monitor
+            ? Quickshell.screens.find(candidate => candidate.name === monitor.name)
+            : null;
+        if (focusedScreen) root.screen = focusedScreen;
+    }
 
     property var systemCommands: [
         { name: "/shutdown", exec: "systemctl poweroff", desc: "Shut down the PC" },
@@ -42,9 +62,26 @@ PanelWindow {
     Process { id: saveHistoryProcess }
 
     function resetScroll() {
-        if (appList.count > 0) {
-            appList.currentIndex = 0
-            appList.positionViewAtIndex(0, ListView.Beginning)
+        appList.currentIndex = appList.count > 0 ? 0 : -1
+        appList.contentY = appList.originY
+    }
+
+    function moveSelection(direction) {
+        if (appList.count === 0) return;
+        appList.currentIndex = Math.max(0, Math.min(appList.count - 1,
+            appList.currentIndex + direction));
+        appList.positionViewAtIndex(appList.currentIndex, ListView.Contain);
+    }
+
+    function wallpaperQuery(query) {
+        return /^\/wallpaper(?:\s|$)/.test(query);
+    }
+
+    function acceptWallpapers(data) {
+        root.wallpapers = JSON.parse(data);
+        root.wallpapersLoaded = true;
+        if (wallpaperQuery(searchInput.text.toLowerCase().trim())) {
+            root.filterApps();
         }
     }
 
@@ -66,6 +103,7 @@ else:
             onRead: data => {
                 try {
                     root.appHistory = JSON.parse(data.trim())
+                    if (!searchInput.text.trim().startsWith("/")) root.filterApps()
                 } catch(e) {
                     root.appHistory = {}
                 }
@@ -124,17 +162,7 @@ print(json.dumps(res))
         stdout: SplitParser {
             onRead: data => {
                 try {
-                    let wallpapers = JSON.parse(data)
-                    appListModel.clear()
-                    for (let i = 0; i < wallpapers.length; i++) {
-                        appListModel.append({
-                            name: wallpapers[i].name,
-                            path: wallpapers[i].path,
-                            exec: wallpapers[i].exec,
-                            count: 0
-                        })
-                    }
-                    root.resetScroll()
+                    root.acceptWallpapers(data)
                 } catch(e) {}
             }
         }
@@ -146,8 +174,24 @@ print(json.dumps(res))
 
         let matched = []
 
-        if (query.startsWith("/wallpaper")) {
-            loadWallpapersProcess.running = true
+        if (wallpaperQuery(query)) {
+            if (!wallpapersLoaded) {
+                if (!loadWallpapersProcess.running) loadWallpapersProcess.running = true;
+            } else {
+                const wallpaperFilter = query.slice("/wallpaper".length).trim();
+                for (let i = 0; i < wallpapers.length; i++) {
+                    const wallpaper = wallpapers[i];
+                    if (wallpaper.name.toLowerCase().includes(wallpaperFilter)) {
+                        appListModel.append({
+                            name: wallpaper.name,
+                            path: wallpaper.path,
+                            exec: wallpaper.exec,
+                            count: 0
+                        });
+                    }
+                }
+            }
+            root.resetScroll()
             return;
         } else if (query.startsWith("/")) {
             for (let i = 0; i < systemCommands.length; i++) {
@@ -242,6 +286,8 @@ with open(path, 'w') as f:
 
     onVisibleChanged: {
         if (visible) {
+            root.focusScreen()
+            root.wallpapersLoaded = false
             searchInput.text = ""
             loadHistoryProcess.running = true
             if (allApps.length === 0) {
@@ -250,7 +296,9 @@ with open(path, 'w') as f:
                 filterApps()
             }
             root.resetScroll()
-            searchInput.forceActiveFocus()
+            Qt.callLater(() => {
+                if (root.visible) searchInput.forceActiveFocus();
+            })
         }
     }
 
@@ -260,9 +308,11 @@ with open(path, 'w') as f:
     }
 
     Rectangle {
+        id: launcherCard
         anchors.centerIn: parent
-        width: 540
-        height: 460
+        width: Math.max(0, Math.min(540, parent.width - 32))
+        height: Math.max(0, Math.min(460, parent.height - 32,
+            74 + (appListModel.count > 0 ? 12 + root.resultsHeight : 0)))
         radius: 12
         color: theme ? theme.background : "#1e1e2e"
         border.color: theme ? theme.accent : "#cba6f7"
@@ -281,7 +331,8 @@ with open(path, 'w') as f:
             // Search bar
             Rectangle {
                 Layout.fillWidth: true
-                height: 42
+                Layout.preferredHeight: 42
+                Layout.minimumHeight: 42
                 radius: 8
                 color: theme ? theme.surface : "#313244"
 
@@ -307,17 +358,8 @@ with open(path, 'w') as f:
 
                         onTextChanged: root.filterApps()
 
-                        Keys.onDownPressed: {
-                            if (appList.currentIndex < appList.count - 1) {
-                                appList.currentIndex++
-                            }
-                        }
-
-                        Keys.onUpPressed: {
-                            if (appList.currentIndex > 0) {
-                                appList.currentIndex--
-                            }
-                        }
+                        Keys.onDownPressed: root.moveSelection(1)
+                        Keys.onUpPressed: root.moveSelection(-1)
 
                         Keys.onEscapePressed: root.visible = false
 
@@ -334,88 +376,92 @@ with open(path, 'w') as f:
             }
 
             // App List
-            ScrollView {
+            ListView {
+                id: appList
+                visible: count > 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.minimumWidth: 0
+                Layout.minimumHeight: 0
                 clip: true
+                spacing: 6
+                model: appListModel
+                currentIndex: -1
+                boundsBehavior: Flickable.StopAtBounds
+                keyNavigationEnabled: false
+                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
-                ListView {
-                    id: appList
-                    anchors.fill: parent
-                    spacing: 6
-                    model: appListModel
-                    currentIndex: 0
+                delegate: Rectangle {
+                    required property var model
+                    required property int index
 
-                    delegate: Rectangle {
-                        required property var model
-                        required property int index
+                    width: appList.width
+                    height: model.path !== undefined && model.path !== "" ? 48 : 40
+                    radius: 6
 
-                        width: appList.width
-                        height: model.path !== undefined && model.path !== "" ? 48 : 40
-                        radius: 6
+                    property bool isSelected: index === appList.currentIndex
 
-                        property bool isSelected: index === appList.currentIndex
+                    color: isSelected
+                        ? (theme ? theme.accent : "#cba6f7")
+                        : (itemMouse.containsMouse ? (theme ? theme.surface : "#313244") : "transparent")
 
-                        color: isSelected
-                            ? (theme ? theme.accent : "#cba6f7")
-                            : (itemMouse.containsMouse ? (theme ? theme.surface : "#313244") : "transparent")
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        spacing: 12
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 12
-                            anchors.rightMargin: 12
-                            spacing: 12
+                        Item {
+                            width: model.path !== undefined && model.path !== "" ? 64 : 28
+                            height: model.path !== undefined && model.path !== "" ? 36 : 28
+                            Layout.alignment: Qt.AlignVCenter
 
-                            Item {
-                                width: model.path !== undefined && model.path !== "" ? 64 : 28
-                                height: model.path !== undefined && model.path !== "" ? 36 : 28
-                                Layout.alignment: Qt.AlignVCenter
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 4
+                                color: "#11111b"
+                                visible: model.path !== undefined && model.path !== ""
+                                border.color: isSelected ? (theme ? theme.background : "#1e1e2e") : (theme ? theme.accent : "#cba6f7")
+                                border.width: 1
 
-                                Rectangle {
+                                Image {
+                                    id: thumbImage
                                     anchors.fill: parent
-                                    radius: 4
-                                    color: "#11111b"
-                                    visible: model.path !== undefined && model.path !== ""
-                                    border.color: isSelected ? (theme ? theme.background : "#1e1e2e") : (theme ? theme.accent : "#cba6f7")
-                                    border.width: 1
-
-                                    Image {
-                                        id: thumbImage
-                                        anchors.fill: parent
-                                        anchors.margins: 1
-                                        source: (model.path !== undefined && model.path !== "") ? model.path : ""
-                                        fillMode: Image.PreserveAspectCrop
-                                        visible: source != ""
-                                        clip: true
-                                    }
-                                }
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: model.path === undefined || model.path === "" ? (model.name.startsWith("/") ? "" : "󱓞") : ""
-                                    font.pixelSize: 14
-                                    visible: model.path === undefined || model.path === ""
+                                    anchors.margins: 1
+                                    source: (model.path !== undefined && model.path !== "") ? model.path : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    visible: source != ""
+                                    clip: true
                                 }
                             }
 
                             Text {
-                                Layout.fillWidth: true
-                                text: (model.path !== undefined && model.path !== "") ? model.name : model.name
-                                color: isSelected
-                                    ? (theme ? theme.background : "#1e1e2e")
-                                    : (theme ? theme.text : "#cdd6f4")
-                                font.pixelSize: 13
-                                font.bold: true
-                                elide: Text.ElideRight
+                                anchors.centerIn: parent
+                                text: model.path === undefined || model.path === "" ? (model.name.startsWith("/") ? "" : "󱓞") : ""
+                                font.pixelSize: 14
+                                visible: model.path === undefined || model.path === ""
                             }
                         }
 
-                        MouseArea {
-                            id: itemMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onEntered: appList.currentIndex = index
-                            onClicked: root.launchApp(model.name, model.exec)
+                        Text {
+                            Layout.fillWidth: true
+                            text: (model.path !== undefined && model.path !== "") ? model.name : model.name
+                            color: isSelected
+                                ? (theme ? theme.background : "#1e1e2e")
+                                : (theme ? theme.text : "#cdd6f4")
+                            font.pixelSize: 13
+                            font.bold: true
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    MouseArea {
+                        id: itemMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            appList.currentIndex = index;
+                            root.launchApp(model.name, model.exec);
                         }
                     }
                 }

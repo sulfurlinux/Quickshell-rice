@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Run with: bash tests/screenshot.sh
-# Mock Wayland tools to test capture sequencing and cleanup without a compositor.
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
 fixture=$(mktemp -d)
