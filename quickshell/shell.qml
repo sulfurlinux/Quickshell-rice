@@ -8,6 +8,8 @@ Scope {
 
     property bool showOnAllScreens: true
     property string primaryMonitorName: "DP-1"
+    readonly property var primaryScreen: Quickshell.screens.find(s => s.name === primaryMonitorName)
+        ?? Quickshell.screens[0] ?? null
 
     property var currentTheme: {
         "background": "#1e1e2e",
@@ -60,6 +62,7 @@ if os.path.exists(path):
     Rice.Notifications {
         id: notificationCenter
         theme: root.currentTheme
+        targetScreen: root.primaryScreen
     }
 
     IpcHandler {
@@ -113,7 +116,7 @@ if os.path.exists(path):
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens
-            : [Quickshell.screens.find(s => s.name === primaryMonitorName) ?? Quickshell.screens.primary]
+            : (primaryScreen ? [primaryScreen] : [])
 
         delegate: Component {
             Rice.Wallpaper {
@@ -126,7 +129,7 @@ if os.path.exists(path):
     Variants {
         model: showOnAllScreens
             ? Quickshell.screens
-            : [Quickshell.screens.find(s => s.name === primaryMonitorName) ?? Quickshell.screens.primary]
+            : (primaryScreen ? [primaryScreen] : [])
 
         delegate: Component {
             Rice.Bar {

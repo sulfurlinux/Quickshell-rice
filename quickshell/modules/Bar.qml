@@ -169,7 +169,7 @@ PanelWindow {
             }
 
             Text {
-                anchors.centerIn: parent
+                Layout.alignment: Qt.AlignVCenter
                 text: root.currentTime
                 color: theme ? theme.text : "#cdd6f4"
                 font.pixelSize: 15

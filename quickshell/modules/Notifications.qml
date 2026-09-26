@@ -8,6 +8,7 @@ Scope {
     id: root
 
     property var theme
+    property var targetScreen: Quickshell.screens[0] ?? null
     property int notificationTimeout: 5000
     property bool centerVisible: false
     property bool doNotDisturb: false
@@ -86,9 +87,9 @@ Scope {
 
     PanelWindow {
         id: popupWindow
-        visible: !root.doNotDisturb
+        visible: !root.doNotDisturb && root.targetScreen !== null
 
-        screen: Quickshell.screens.primary
+        screen: root.targetScreen
 
         anchors {
             top: true
@@ -231,9 +232,9 @@ Scope {
     PanelWindow {
         id: centerWindow
 
-        visible: root.centerVisible
+        visible: root.centerVisible && root.targetScreen !== null
         focusable: root.centerVisible
-        screen: Quickshell.screens.primary
+        screen: root.targetScreen
 
         anchors {
             top: true

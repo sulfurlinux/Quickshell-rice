@@ -67,13 +67,13 @@ Keep the cloned repository if you want to pull updates or edit the source later.
 
 Edit the copied files in `~/.config` before loading the setup:
 
-| File                                                     | What to adjust                                                                                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `hypr/modules/monitors.lua`                              | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs.                          |
-| `hypr/modules/autostart.lua` and `quickshell/shell.qml`  | The `DP-1` primary-monitor setting, if your output has a different name.                                                       |
-| `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications.                                                                   |
-| `quickshell/modules/Wallpaper.qml`                       | Replace every `/home/sulfur` with your actual home-directory path, including the Python environment and wallpaper cache paths. |
-| `fish/config.fish` and `fish/fish_variables`             | Remove or adapt the personal Spicetify paths if you do not use them.                                                           |
+| File                                                     | What to adjust                                                                                        |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `hypr/modules/monitors.lua`                              | Monitor names, resolutions, refresh rates, and positions. Run `hyprctl monitors` to see your outputs. |
+| `hypr/modules/autostart.lua` and `quickshell/shell.qml`  | The `DP-1` primary-monitor setting, if your output has a different name.                              |
+| `hypr/modules/input.lua` and `hypr/modules/programs.lua` | Keyboard layout, mouse settings, and preferred applications.                                          |
+| `quickshell/modules/Wallpaper.qml`                       | Uses your home directory automatically. Customize the default wallpaper filename here if needed.      |
+| `fish/config.fish` and `fish/fish_variables`             | Remove or adapt the personal Spicetify paths if you do not use them.                                  |
 
 Create the user folders and the Python environment used by the wallpaper-color script:
 
@@ -83,7 +83,7 @@ python3 -m venv "$HOME/.cache/quickshell_venv"
 "$HOME/.cache/quickshell_venv/bin/python3" -m pip install Pillow
 ```
 
-Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or change the default wallpaper paths in `Wallpaper.qml` to point to your own image. Additional wallpapers in that directory can be selected through the launcher.
+Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or choose an image from `/wallpaper` in the launcher. The saved selection is restored at startup; if no valid image is available, a solid background is shown.
 
 Generate the initial theme files used by Quickshell and Hyprlock:
 
