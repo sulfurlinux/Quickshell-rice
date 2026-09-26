@@ -111,17 +111,30 @@ PanelWindow {
         anchors.fill: parent
         color: "transparent"
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 10
-            anchors.rightMargin: 10
-            anchors.topMargin: 6
-            anchors.bottomMargin: 6
-            spacing: 12
+        Text {
+            id: clock
+            anchors.centerIn: parent
+            text: root.currentTime
+            color: root.theme ? root.theme.text : "#cdd6f4"
+            font.pixelSize: 15
+            font.bold: true
+        }
 
+        Flickable {
+            anchors.left: parent.left
+            anchors.right: clock.left
+            anchors.leftMargin: 10
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            height: 28
+            contentWidth: workspaceRow.width
+            contentHeight: 28
+            clip: true
+            interactive: contentWidth > width
+            boundsBehavior: Flickable.StopAtBounds
             Row {
                 spacing: 6
-                Layout.alignment: Qt.AlignLeft
+                id: workspaceRow
 
                 Repeater {
                     model: Hyprland.workspaces
@@ -165,14 +178,27 @@ PanelWindow {
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-            }
+        }
+
+        RowLayout {
+            anchors.left: clock.right
+            anchors.right: parent.right
+            anchors.leftMargin: 12
+            anchors.rightMargin: 10
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.topMargin: 6
+            anchors.bottomMargin: 6
+            spacing: 8
+            clip: true
+
+            Item { Layout.fillWidth: true }
 
             BarMusic {
                 theme: root.theme
                 services: root.services
-                Layout.preferredWidth: Math.max(110, Math.min(300, root.width * 0.22))
+                Layout.fillWidth: true
+                Layout.preferredWidth: 300
                 Layout.minimumWidth: 100
                 Layout.maximumWidth: 300
             }
@@ -183,116 +209,99 @@ PanelWindow {
                 visible: root.width >= 1000 && root.services && root.services.cavaAvailable
             }
 
-            Text {
-                Layout.alignment: Qt.AlignVCenter
-                text: root.currentTime
-                color: theme ? theme.text : "#cdd6f4"
-                font.pixelSize: 15
-                font.bold: true
+            BarResources {
+                theme: root.theme
+                services: root.services
             }
 
-            Item {
-                Layout.fillWidth: true
-            }
+            Rectangle {
+                height: 28
+                implicitWidth: micRow.implicitWidth + 12
+                radius: 6
+                color: theme ? theme.surface : "#313244"
 
-            RowLayout {
-                spacing: 8
-                Layout.alignment: Qt.AlignRight
+                RowLayout {
+                    id: micRow
+                    anchors.centerIn: parent
+                    spacing: 4
 
-                BarResources {
-                    theme: root.theme
-                    services: root.services
-                }
-
-                Rectangle {
-                    height: 28
-                    implicitWidth: micRow.implicitWidth + 12
-                    radius: 6
-                    color: theme ? theme.surface : "#313244"
-
-                    RowLayout {
-                        id: micRow
-                        anchors.centerIn: parent
-                        spacing: 4
-
-                        Text {
-                            text: root.sourceMuted ? "" : ""
-                            font.pixelSize: 16
-                            font.bold: true
-                            color: theme ? theme.text : "#cdd6f4"
-                        }
-
-                        Text {
-                            text: root.sourceVolume
-                            color: theme ? theme.text : "#cdd6f4"
-                            font.pixelSize: 12
-                            font.bold: true
-                        }
+                    Text {
+                        text: root.sourceMuted ? "" : ""
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: theme ? theme.text : "#cdd6f4"
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onWheel: (wheel) => {
-                            if (!root.canScrollSource) return;
-                            root.canScrollSource = false;
-                            sourceScrollTimer.start();
-
-                            let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
-                            audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_SOURCE@", arg];
-                            audioExec.running = true;
-                            root.updateAudio();
-                        }
-                        onClicked: {
-                            audioExec.command = ["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"];
-                            audioExec.running = true;
-                            root.updateAudio();
-                        }
+                    Text {
+                        text: root.sourceVolume
+                        color: theme ? theme.text : "#cdd6f4"
+                        font.pixelSize: 12
+                        font.bold: true
                     }
                 }
 
-                Rectangle {
-                    height: 28
-                    implicitWidth: sinkRow.implicitWidth + 12
-                    radius: 6
-                    color: theme ? theme.surface : "#313244"
+                MouseArea {
+                    anchors.fill: parent
+                    onWheel: (wheel) => {
+                        if (!root.canScrollSource) return;
+                        root.canScrollSource = false;
+                        sourceScrollTimer.start();
 
-                    RowLayout {
-                        id: sinkRow
-                        anchors.centerIn: parent
-                        spacing: 4
+                        let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
+                        audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_SOURCE@", arg];
+                        audioExec.running = true;
+                        root.updateAudio();
+                    }
+                    onClicked: {
+                        audioExec.command = ["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"];
+                        audioExec.running = true;
+                        root.updateAudio();
+                    }
+                }
+            }
 
-                        Text {
-                            text: root.sinkMuted ? "" : ""
-                            font.pixelSize: 16
-                            font.bold: true
-                            color: theme ? theme.text : "#cdd6f4"
-                        }
+            Rectangle {
+                height: 28
+                implicitWidth: sinkRow.implicitWidth + 12
+                radius: 6
+                color: theme ? theme.surface : "#313244"
 
-                        Text {
-                            text: root.sinkVolume
-                            color: theme ? theme.text : "#cdd6f4"
-                            font.pixelSize: 12
-                            font.bold: true
-                        }
+                RowLayout {
+                    id: sinkRow
+                    anchors.centerIn: parent
+                    spacing: 4
+
+                    Text {
+                        text: root.sinkMuted ? "" : ""
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: theme ? theme.text : "#cdd6f4"
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onWheel: (wheel) => {
-                            if (!root.canScrollSink) return;
-                            root.canScrollSink = false;
-                            sinkScrollTimer.start();
+                    Text {
+                        text: root.sinkVolume
+                        color: theme ? theme.text : "#cdd6f4"
+                        font.pixelSize: 12
+                        font.bold: true
+                    }
+                }
 
-                            let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
-                            audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", arg];
-                            audioExec.running = true;
-                            root.updateAudio();
-                        }
-                        onClicked: {
-                            audioExec.command = ["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"];
-                            audioExec.running = true;
-                            root.updateAudio();
-                        }
+                MouseArea {
+                    anchors.fill: parent
+                    onWheel: (wheel) => {
+                        if (!root.canScrollSink) return;
+                        root.canScrollSink = false;
+                        sinkScrollTimer.start();
+
+                        let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
+                        audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", arg];
+                        audioExec.running = true;
+                        root.updateAudio();
+                    }
+                    onClicked: {
+                        audioExec.command = ["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"];
+                        audioExec.running = true;
+                        root.updateAudio();
                     }
                 }
             }

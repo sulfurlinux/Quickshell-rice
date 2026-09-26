@@ -289,6 +289,12 @@ Scope {
                         implicitHeight: 28
                         Accessible.name: "Do not disturb"
 
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
                         contentItem: Text {
                             text: dndButton.text
                             color: root.doNotDisturb
