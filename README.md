@@ -10,7 +10,7 @@ A personal Linux rice using Arch, Hyprland and Quickshell.
 - Fix the screenshot utility white background stacking
 - Fix the Launcher buging when the cursor is inside the window
 - make the louncher icons use the text color
-- Fix the Launcher Scaling 
+- Fix the Launcher Scaling
 
 ## Install
 1. Make sure you got the dependencies installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
