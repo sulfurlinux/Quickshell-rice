@@ -169,6 +169,8 @@ Run `hyprctl reload` after editing. Start a new Hyprland session to see each dis
 
 Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/power` to open the shutdown, restart, lock, and logout submenu. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
 
+The launcher reuses [Quickshell's desktop entry registry](https://quickshell.org/docs/v0.2.1/types/Quickshell/DesktopEntries/), which updates when desktop files change. Wallpaper lists are indexed on first use and kept current by [Qt's folder watcher](https://doc.qt.io/qt-6/qml-qt-labs-folderlistmodel-folderlistmodel.html). Reopening the launcher or wallpaper menu does not start Python to rebuild these lists.
+
 Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
 
 All power and session actions run immediately without a confirmation dialog.
@@ -197,7 +199,7 @@ The clock uses a shared native `SystemClock` at minute precision, without spawni
 
 The music section shows the active MPRIS player's track and artist, with previous, play/pause, and next controls. Click the track to open its player; right-click it to switch between players. It disappears when no player is available, and unsupported controls are disabled.
 
-Cava shows a 12-bar spectrum of the default PipeWire output. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. The spectrum is hidden when the space between the clock and audio controls is too narrow.
+Cava shows a 12-bar spectrum of the default PipeWire output at 15 FPS, producing 25% fewer updates than 20 FPS. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. The spectrum is hidden when the space between the clock and audio controls is too narrow.
 
 CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process. Cava stops when no visible bar has room for its spectrum and restarts when space becomes available. Errors appear in the Quickshell logs.
 

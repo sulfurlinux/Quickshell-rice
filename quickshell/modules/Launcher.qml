@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -26,10 +27,18 @@ PanelWindow {
 
     color: "transparent"
 
-    property var allApps: []
+    readonly property var allApps: DesktopEntries.applications.values.map(entry => ({
+        name: entry.name,
+        exec: "desktop_entry:" + entry.id,
+        search: entry.command.join(" ")
+    }))
+    onAllAppsChanged: {
+        if (root.visible && !searchInput.text.trim().startsWith("/")) root.filterApps();
+    }
     property var appHistory: ({})
     property var wallpapers: []
     property bool wallpapersLoaded: false
+    property bool wallpaperIndexStarted: false
     property var clipboardEntries: []
     property bool clipboardLoaded: false
     property string clipboardError: ""
@@ -278,12 +287,42 @@ PanelWindow {
         return /^\/wallpaper(?:\s|$)/.test(query);
     }
 
-    function acceptWallpapers(data) {
-        root.wallpapers = JSON.parse(data);
+    function refreshWallpapers() {
+        if (wallpaperFolder.status !== FolderListModel.Ready) return;
+        const entries = [];
+        for (let i = 0; i < wallpaperFolder.count; i++) {
+            entries.push({
+                name: wallpaperFolder.get(i, "fileName"),
+                path: wallpaperFolder.get(i, "fileUrl").toString(),
+                exec: "wallpaper_select:" + wallpaperFolder.get(i, "filePath")
+            });
+        }
+        root.wallpapers = entries;
         root.wallpapersLoaded = true;
-        if (wallpaperQuery(searchInput.text.toLowerCase().trim())) {
+        if (root.visible && wallpaperQuery(searchInput.text.toLowerCase().trim())) {
             root.filterApps();
         }
+    }
+
+    FolderListModel {
+        id: wallpaperFolder
+        folder: root.wallpaperIndexStarted
+            ? "file://" + Quickshell.env("HOME").split("/").map(part => encodeURIComponent(part)).join("/") + "/Pictures/Wallpapers"
+            : ""
+        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
+        caseSensitive: false
+        showDirs: false
+        showHidden: true
+        sortField: FolderListModel.Name
+        onStatusChanged: Qt.callLater(root.refreshWallpapers)
+    }
+
+    Connections {
+        target: wallpaperFolder
+        function onRowsInserted() { Qt.callLater(root.refreshWallpapers); }
+        function onRowsRemoved() { Qt.callLater(root.refreshWallpapers); }
+        function onModelReset() { Qt.callLater(root.refreshWallpapers); }
+        function onDataChanged() { Qt.callLater(root.refreshWallpapers); }
     }
 
     Process {
@@ -308,63 +347,6 @@ else:
                 } catch(e) {
                     root.appHistory = {}
                 }
-            }
-        }
-    }
-
-    Process {
-        id: loadAppsProcess
-        command: ["python3", "-c", "
-import glob, configparser, json, os
-
-files = glob.glob('/usr/share/applications/*.desktop') + glob.glob(os.path.expanduser('~/.local/share/applications/*.desktop'))
-apps = {}
-
-for f in files:
-    try:
-        cp = configparser.ConfigParser(interpolation=None)
-        cp.read(f, encoding='utf-8')
-        if 'Desktop Entry' in cp:
-            e = cp['Desktop Entry']
-            if e.get('NoDisplay') != 'true' and e.get('Type') == 'Application':
-                name = e.get('Name')
-                cmd = e.get('Exec')
-                if name and cmd:
-                    clean_cmd = ' '.join([w for w in cmd.split() if not w.startswith('%')])
-                    apps[name] = clean_cmd
-    except Exception:
-        pass
-
-res = [{'name': k, 'exec': v} for k, v in sorted(apps.items())]
-print(json.dumps(res))
-"]
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    root.allApps = JSON.parse(data)
-                    root.filterApps()
-                } catch(e) {}
-            }
-        }
-    }
-
-    Process {
-        id: loadWallpapersProcess
-        command: ["python3", "-c", "
-import os, json
-path = os.path.expanduser('~/Pictures/Wallpapers')
-images = []
-if os.path.exists(path):
-    valid_exts = ('.png', '.jpg', '.jpeg', '.webp')
-    images = [f for f in os.listdir(path) if f.lower().endswith(valid_exts)]
-res = [{'name': img, 'path': 'file://' + os.path.join(path, img), 'exec': 'wallpaper_select:' + os.path.join(path, img)} for img in sorted(images)]
-print(json.dumps(res))
-"]
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    root.acceptWallpapers(data)
-                } catch(e) {}
             }
         }
     }
@@ -427,7 +409,7 @@ print(json.dumps(res))
             matched.push({ name: "← Back to commands", path: "", exec: "power_back", count: 0 });
         } else if (wallpaperQuery(query)) {
             if (!wallpapersLoaded) {
-                if (!loadWallpapersProcess.running) loadWallpapersProcess.running = true;
+                root.wallpaperIndexStarted = true;
             } else {
                 const wallpaperFilter = query.slice("/wallpaper".length).trim();
                 for (let i = 0; i < wallpapers.length; i++) {
@@ -461,7 +443,7 @@ print(json.dumps(res))
         } else {
             for (let i = 0; i < allApps.length; i++) {
                 let app = allApps[i]
-                if (query === "" || app.name.toLowerCase().includes(query) || app.exec.toLowerCase().includes(query)) {
+                if (query === "" || app.name.toLowerCase().includes(query) || app.search.toLowerCase().includes(query)) {
                     let usageCount = root.appHistory[app.name] || 0
                     matched.push({
                         name: app.name,
@@ -565,6 +547,17 @@ with open(path, 'w') as f:
             saveHistoryProcess.running = true
         }
 
+        if (execCmd.startsWith("desktop_entry:")) {
+            const entry = DesktopEntries.byId(execCmd.slice("desktop_entry:".length));
+            if (!entry) {
+                root.filterApps();
+                return;
+            }
+            entry.execute();
+            root.visible = false;
+            return;
+        }
+
         let safeCmd = execCmd.replace(/'/g, "'\\''")
         execProcess.command = ["sh", "-c", "nohup " + safeCmd + " >/dev/null 2>&1 &"]
         execProcess.running = true
@@ -574,18 +567,13 @@ with open(path, 'w') as f:
     onVisibleChanged: {
         if (visible) {
             root.focusScreen()
-            root.wallpapersLoaded = false
             root.clipboardLoaded = false
             root.clipboardError = ""
             root.runningAppsLoaded = false
             root.runningAppsError = ""
             searchInput.text = ""
             loadHistoryProcess.running = true
-            if (allApps.length === 0) {
-                loadAppsProcess.running = true
-            } else {
-                filterApps()
-            }
+            filterApps()
             root.resetScroll()
             Qt.callLater(() => {
                 if (root.visible) searchInput.forceActiveFocus();
