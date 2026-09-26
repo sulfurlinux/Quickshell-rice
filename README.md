@@ -139,7 +139,7 @@ qs
 | `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor             |
 | `Super + Shift + R`           | Reload Hyprland and restart Quickshell                          |
 
-Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/lock` to lock the screen. It also provides `/shutdown`, `/reboot`, and `/logout` commands.
+Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/power` to open the shutdown, restart, lock, and logout submenu. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
 
 Shutdown, restart, and logout require confirmation. Choose the action button to proceed, or press `Escape` to cancel. Cancel is focused by default; locking the screen remains immediate.
 
@@ -148,7 +148,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 ## Todo
 
 - Add timestamps and a do not disturb to the notification center
-- Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
 
 ## Roadmap

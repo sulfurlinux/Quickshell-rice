@@ -47,11 +47,17 @@ PanelWindow {
         if (focusedScreen) root.screen = focusedScreen;
     }
 
-    property var systemCommands: [
+    readonly property bool inPowerMenu: /^\/power(?:\s|$)/.test(searchInput.text.toLowerCase().trim())
+
+    property var powerCommands: [
         { name: "/shutdown", exec: "systemctl poweroff", desc: "Shut down the PC" },
         { name: "/reboot", exec: "systemctl reboot", desc: "Restart the system" },
         { name: "/lock", exec: "hyprlock", desc: "Lock the screen" },
-        { name: "/logout", exec: "loginctl terminate-user $USER", desc: "Log out of the session" },
+        { name: "/logout", exec: "loginctl terminate-user $USER", desc: "Log out of the session" }
+    ]
+
+    property var systemCommands: [
+        { name: "/power", exec: "list_power_actions", desc: "Power and session actions" },
         { name: "/wallpaper", exec: "list_wallpapers", desc: "Select a wallpaper" }
     ]
 
@@ -175,7 +181,21 @@ print(json.dumps(res))
 
         let matched = []
 
-        if (wallpaperQuery(query)) {
+        if (/^\/power(?:\s|$)/.test(query)) {
+            const powerFilter = query.slice("/power".length).trim();
+            for (let i = 0; i < powerCommands.length; i++) {
+                const cmd = powerCommands[i];
+                if (cmd.name.toLowerCase().includes(powerFilter) || cmd.desc.toLowerCase().includes(powerFilter)) {
+                    matched.push({
+                        name: cmd.name + " — " + cmd.desc,
+                        path: "",
+                        exec: cmd.exec,
+                        count: 0
+                    });
+                }
+            }
+            matched.push({ name: "← Back to commands", path: "", exec: "power_back", count: 0 });
+        } else if (wallpaperQuery(query)) {
             if (!wallpapersLoaded) {
                 if (!loadWallpapersProcess.running) loadWallpapersProcess.running = true;
             } else {
@@ -260,6 +280,20 @@ print(json.dumps(res))
 
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
+
+        if (execCmd === "list_power_actions") {
+            searchInput.text = "/power ";
+            searchInput.forceActiveFocus();
+            return;
+        }
+        if (execCmd === "power_back") {
+            searchInput.text = "/";
+            searchInput.forceActiveFocus();
+            return;
+        }
+        // Keep existing slash shortcuts usable without listing them at the top level.
+        const shortcut = powerCommands.find(cmd => cmd.name === execCmd.trim().toLowerCase());
+        if (shortcut) execCmd = shortcut.exec;
 
         const action = powerAction(execCmd);
         if (action) {
@@ -502,7 +536,10 @@ with open(path, 'w') as f:
                         Keys.onDownPressed: root.moveSelection(1)
                         Keys.onUpPressed: root.moveSelection(-1)
 
-                        Keys.onEscapePressed: root.visible = false
+                        Keys.onEscapePressed: {
+                            if (root.inPowerMenu) searchInput.text = "/";
+                            else root.visible = false;
+                        }
 
                         onAccepted: {
                             if (appList.count > 0 && appList.currentIndex >= 0) {
