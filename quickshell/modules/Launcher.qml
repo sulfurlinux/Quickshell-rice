@@ -258,8 +258,6 @@ print(json.dumps(res))
 
     function powerAction(execCmd) {
         switch (execCmd.trim().replace(/\s+/g, " ")) {
-        case "systemctl poweroff":
-            return { label: "Shut down", command: ["systemctl", "poweroff"] };
         case "systemctl reboot":
             return { label: "Restart", command: ["systemctl", "reboot"] };
         case "loginctl terminate-user $USER":
