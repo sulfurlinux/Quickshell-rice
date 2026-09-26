@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import tempfile
+import subprocess
 
 
 def get_dominant_color(img_path):
@@ -45,6 +46,33 @@ def atomic_write(path, content):
     os.replace(temporary, path)
 
 
+def update_hyprland(accent, cache_dir):
+    channels = [int(accent[index:index + 2], 16) for index in (1, 3, 5)]
+    surface = (49, 50, 68)
+    bright = "".join(f"{min(255, int(channel * 0.75 + 255 * 0.25)):02x}" for channel in channels)
+    muted = "".join(f"{int(channel * 0.35 + base * 0.65):02x}" for channel, base in zip(channels, surface))
+    shadow = "".join(f"{int(channel * 0.12):02x}" for channel in channels)
+    active = accent.lstrip("#")
+    atomic_write(os.path.join(cache_dir, "hyprland_colors.txt"),
+                 "\n".join((active, bright, muted, shadow)) + "\n")
+    if not os.environ.get("HYPRLAND_INSTANCE_SIGNATURE"):
+        return
+    configuration = (
+        'hl.config({general={col={active_border={colors={"rgba(' + active + 'ee)",'
+        '"rgba(' + bright + 'ee)"},angle=45},inactive_border="rgba(' + muted + 'aa)"}},'
+        'decoration={shadow={color="rgba(' + shadow + 'ee)"}}})'
+    )
+    try:
+        result = subprocess.run(["hyprctl", "eval", configuration],
+                                capture_output=True, text=True, check=True, timeout=5)
+        if result.stdout.strip() and result.stdout.strip().lower() != "ok":
+            print("Hyprland theme: " + result.stdout.strip(), file=sys.stderr)
+    except (OSError, subprocess.SubprocessError) as error:
+        print(f"Hyprland theme: {error}", file=sys.stderr)
+        if isinstance(error, subprocess.CalledProcessError):
+            print(error.stderr or error.stdout or "", file=sys.stderr)
+
+
 def main():
     if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--selected"):
         print(f"Usage: {sys.argv[0]} <image-path>", file=sys.stderr)
@@ -85,6 +113,8 @@ def main():
     atomic_write(wallpaper_conf, f"$wallpaper = {clean_path}\n")
 
     print(json.dumps({"wallpaper": clean_path, "theme": theme_data}))
+    sys.stdout.flush()
+    update_hyprland(accent, cache_dir)
 
     return 0
 

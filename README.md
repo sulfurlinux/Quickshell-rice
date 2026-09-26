@@ -8,7 +8,7 @@ The setup is a work in progress. See [Roadmap](#roadmap) for planned features.
 
 - **Quickshell:** a bar with workspaces, clock, and audio controls; an app launcher; notifications; screenshots; and a wallpaper picker.
 - **Hyprland:** window rules, keyboard shortcuts, Spotify and Discord scratchpads, and a Hyprlock config.
-- **Wallpaper colors:** a Python script that derives an accent color from the wallpaper for Quickshell and generates Hyprlock theme files.
+- **Wallpaper colors:** a Python script that derives an accent color for Quickshell, Hyprland borders and shadows, and Hyprlock.
 - **Terminal:** Ghostty with cursor shaders, Fish, and a Starship prompt.
 - **System tools:** Fastfetch, btop, and Cava configs.
 
@@ -86,6 +86,8 @@ python3 -m venv "$HOME/.cache/quickshell_venv"
 Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or choose an image from `/wallpaper` in the launcher. The saved selection is restored at startup; if no valid image is available, a solid background is shown.
 
 One selection updates every display. A single color extractor updates the Quickshell theme as soon as it finishes; selecting another wallpaper cancels the previous extraction and ignores stale results.
+
+Hyprland's active border gradient, muted inactive border, and shadow tint follow the same accent. Changes apply live through `hyprctl eval`; the saved palette in `~/.cache/hyprland_colors.txt` is restored by `hypr/modules/lookandfeel/theme.lua` on startup and configuration reload.
 
 Generate the initial theme files used by Quickshell and Hyprlock:
 
@@ -199,10 +201,10 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
   - [x] pkiller
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
-- [ ] Dynamic theme system
+- [x] Dynamic theme system
   - [x] Extract color palette from wallpaper
   - [x] Integratation in Quickshell
-  - [ ] Integratation in Hyprland
+  - [x] Integratation in Hyprland
 - [ ] Bar
   - [ ] Logout menu button
   - [ ] Music
