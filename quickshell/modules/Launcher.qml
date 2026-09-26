@@ -333,7 +333,7 @@ with open(path, 'w') as f:
                 }
             }
 
-            // --- APP LIST ---
+            // App List
             ScrollView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
