@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import subprocess
+import re
 
 
 def get_dominant_color(img_path):
@@ -11,7 +12,7 @@ def get_dominant_color(img_path):
         img_path = img_path[7:]
 
     if not os.path.exists(img_path):
-        return "#cba6f7"
+        return None
 
     try:
         from PIL import Image, ImageStat
@@ -36,7 +37,7 @@ def get_dominant_color(img_path):
 
     except Exception as error:
         print(f"Error: {error}", file=sys.stderr)
-        return "#cba6f7"
+        return None
 
 
 def atomic_write(path, content):
@@ -44,6 +45,52 @@ def atomic_write(path, content):
         file.write(content)
         temporary = file.name
     os.replace(temporary, path)
+
+
+def image_signature(path):
+    stat = os.stat(path)
+    return [stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns]
+
+
+def get_cached_color(img_path, cache_dir):
+    path = os.path.realpath(img_path)
+    cache_file = os.path.join(cache_dir, "quickshell_wallpaper_colors.json")
+    entries = {}
+    try:
+        with open(cache_file, encoding="utf-8") as file:
+            saved = json.load(file)
+        if isinstance(saved, dict) and saved.get("version") == 1 and isinstance(saved.get("entries"), dict):
+            entries = saved["entries"]
+    except (OSError, ValueError):
+        pass
+
+    try:
+        signature = image_signature(path)
+    except OSError as error:
+        print(f"Wallpaper color cache: {error}", file=sys.stderr)
+        return "#cba6f7"
+
+    cached = entries.get(path)
+    if (isinstance(cached, dict) and cached.get("signature") == signature
+            and isinstance(cached.get("accent"), str)
+            and re.fullmatch(r"#[0-9a-fA-F]{6}", cached["accent"])):
+        return cached["accent"]
+
+    accent = get_dominant_color(path)
+    if accent is None:
+        return "#cba6f7"
+
+    try:
+        # Do not cache a palette if the image changed during extraction.
+        if image_signature(path) == signature:
+            entries.pop(path, None)
+            entries[path] = {"signature": signature, "accent": accent}
+            while len(entries) > 128:
+                del entries[next(iter(entries))]
+            atomic_write(cache_file, json.dumps({"version": 1, "entries": entries}))
+    except OSError as error:
+        print(f"Wallpaper color cache: {error}", file=sys.stderr)
+    return accent
 
 
 def update_hyprland(accent, cache_dir):
@@ -80,10 +127,9 @@ def main():
 
     img_path = sys.argv[1]
     clean_path = img_path[7:] if img_path.startswith("file://") else img_path
-    accent = get_dominant_color(clean_path)
-
     cache_dir = os.path.expanduser("~/.cache")
     os.makedirs(cache_dir, exist_ok=True)
+    accent = get_cached_color(clean_path, cache_dir)
 
     if len(sys.argv) == 3:
         with open(os.path.join(cache_dir, "quickshell_wallpaper.txt"), encoding="utf-8") as file:

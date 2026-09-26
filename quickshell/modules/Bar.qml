@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 
 PanelWindow {
@@ -12,11 +11,13 @@ PanelWindow {
     property var screenshot
     property var services
 
-    property string currentTime: "--:--"
-    property string sinkVolume: "0%"
-    property bool sinkMuted: false
-    property string sourceVolume: "0%"
-    property bool sourceMuted: false
+    readonly property string currentTime: services ? services.currentTime : "--:--"
+    readonly property var sinkAudio: services ? services.sinkAudio : null
+    readonly property var sourceAudio: services ? services.sourceAudio : null
+    readonly property string sinkVolume: sinkAudio ? Math.round(sinkAudio.volume * 100) + "%" : "--"
+    readonly property bool sinkMuted: sinkAudio ? sinkAudio.muted : false
+    readonly property string sourceVolume: sourceAudio ? Math.round(sourceAudio.volume * 100) + "%" : "--"
+    readonly property bool sourceMuted: sourceAudio ? sourceAudio.muted : false
 
     property bool canScrollSink: true
     property bool canScrollSource: true
@@ -29,69 +30,6 @@ PanelWindow {
 
     implicitHeight: 40
     color: theme ? theme.background : "#1e1e2e"
-
-    Process {
-        id: timeProcess
-        command: ["date", "+%H:%M"]
-        stdout: SplitParser {
-            onRead: data => root.currentTime = data.trim()
-        }
-    }
-
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: timeProcess.running = true
-    }
-
-    Process {
-        id: sinkProcess
-        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
-        stdout: SplitParser {
-            onRead: data => {
-                let text = data.trim()
-                root.sinkMuted = text.includes("[MUTED]")
-                let match = text.match(/([0-9.]+)/)
-                if (match) {
-                    let vol = Math.round(parseFloat(match[1]) * 100)
-                    root.sinkVolume = vol + "%"
-                }
-            }
-        }
-    }
-
-    Process {
-        id: sourceProcess
-        command: ["wpctl", "get-volume", "@DEFAULT_SOURCE@"]
-        stdout: SplitParser {
-            onRead: data => {
-                let text = data.trim()
-                root.sourceMuted = text.includes("[MUTED]")
-                let match = text.match(/([0-9.]+)/)
-                if (match) {
-                    let vol = Math.round(parseFloat(match[1]) * 100)
-                    root.sourceVolume = vol + "%"
-                }
-            }
-        }
-    }
-
-    Process { id: audioExec }
-
-    function updateAudio() {
-        sinkProcess.running = true
-        sourceProcess.running = true
-    }
-
-    Timer {
-        interval: 150
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.updateAudio()
-    }
 
     Timer {
         id: sinkScrollTimer
@@ -268,20 +206,16 @@ PanelWindow {
 
                 MouseArea {
                     anchors.fill: parent
+                    enabled: root.sourceAudio !== null
                     onWheel: (wheel) => {
-                        if (!root.canScrollSource) return;
+                        if (!root.canScrollSource || wheel.angleDelta.y === 0) return;
                         root.canScrollSource = false;
                         sourceScrollTimer.start();
 
-                        let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
-                        audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_SOURCE@", arg];
-                        audioExec.running = true;
-                        root.updateAudio();
+                        root.services.changeVolume(true, wheel.angleDelta.y > 0 ? 0.05 : -0.05);
                     }
                     onClicked: {
-                        audioExec.command = ["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"];
-                        audioExec.running = true;
-                        root.updateAudio();
+                        root.services.toggleMuted(true);
                     }
                 }
             }
@@ -314,20 +248,16 @@ PanelWindow {
 
                 MouseArea {
                     anchors.fill: parent
+                    enabled: root.sinkAudio !== null
                     onWheel: (wheel) => {
-                        if (!root.canScrollSink) return;
+                        if (!root.canScrollSink || wheel.angleDelta.y === 0) return;
                         root.canScrollSink = false;
                         sinkScrollTimer.start();
 
-                        let arg = wheel.angleDelta.y > 0 ? "5%+" : "5%-";
-                        audioExec.command = ["wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", arg];
-                        audioExec.running = true;
-                        root.updateAudio();
+                        root.services.changeVolume(false, wheel.angleDelta.y > 0 ? 0.05 : -0.05);
                     }
                     onClicked: {
-                        audioExec.command = ["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"];
-                        audioExec.running = true;
-                        root.updateAudio();
+                        root.services.toggleMuted(false);
                     }
                 }
             }

@@ -1,9 +1,16 @@
 import Quickshell
+import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import Quickshell.Services.Pipewire
 
 Scope {
     id: root
+    readonly property string currentTime: Qt.formatDateTime(systemClock.date, "HH:mm")
+    SystemClock {
+        id: systemClock
+        precision: SystemClock.Minutes
+    }
     property string selectedPlayerName: ""
     readonly property var players: Mpris.players.values
     readonly property var player: {
@@ -13,6 +20,24 @@ Scope {
     property var resources: null
     property var spectrum: []
     property bool cavaAvailable: false
+    readonly property var sink: Pipewire.defaultAudioSink
+    readonly property var source: Pipewire.defaultAudioSource
+    readonly property var sinkAudio: sink && sink.ready ? sink.audio : null
+    readonly property var sourceAudio: source && source.ready ? source.audio : null
+
+    PwObjectTracker {
+        objects: [root.sink, root.source]
+    }
+
+    function changeVolume(microphone, delta) {
+        const audio = microphone ? root.sourceAudio : root.sinkAudio;
+        if (audio) audio.volume = Math.max(0, Math.min(1, audio.volume + delta));
+    }
+
+    function toggleMuted(microphone) {
+        const audio = microphone ? root.sourceAudio : root.sinkAudio;
+        if (audio) audio.muted = !audio.muted;
+    }
 
     function cyclePlayer() {
         if (players.length === 0) return;

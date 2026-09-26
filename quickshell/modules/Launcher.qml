@@ -33,6 +33,36 @@ PanelWindow {
     property var clipboardEntries: []
     property bool clipboardLoaded: false
     property string clipboardError: ""
+    property var clipboardThumbnails: ({})
+    property string clipboardDatabaseKey: ""
+    readonly property string clipboardPreviewPython: Quickshell.env("HOME") + "/.cache/quickshell_venv/bin/python3"
+
+    function thumbnailKey(entry) {
+        return entry.id + ":" + entry.preview;
+    }
+
+    function retainClipboardThumbnails(entries, database) {
+        const retained = {};
+        const keys = entries.filter(entry => entry.isImage).map(entry => root.thumbnailKey(entry));
+        if (database === root.clipboardDatabaseKey) {
+            for (const key of Object.keys(root.clipboardThumbnails)) {
+                if (keys.includes(key)) retained[key] = root.clipboardThumbnails[key];
+            }
+        }
+        root.clipboardDatabaseKey = database;
+        root.clipboardThumbnails = retained;
+    }
+
+    function rememberClipboardThumbnail(key, source, database) {
+        if (!source || database !== root.clipboardDatabaseKey
+            || !root.clipboardEntries.some(entry => root.thumbnailKey(entry) === key)) return;
+        const updated = Object.assign({}, root.clipboardThumbnails);
+        delete updated[key];
+        updated[key] = source;
+        const keys = Object.keys(updated);
+        while (keys.length > 64) delete updated[keys.shift()];
+        root.clipboardThumbnails = updated;
+    }
     property var runningApps: []
     property bool runningAppsLoaded: false
     property string runningAppsError: ""
@@ -138,6 +168,7 @@ PanelWindow {
             onRead: data => {
                 try {
                     const result = JSON.parse(data);
+                    root.retainClipboardThumbnails(result.entries, result.databaseKey || "");
                     root.clipboardEntries = result.entries;
                     root.clipboardError = result.error;
                     root.clipboardLoaded = true;
@@ -311,7 +342,8 @@ print(json.dumps(res))
                     const entry = clipboardEntries[i];
                     if (entry.preview.toLowerCase().includes(clipboardFilter)) {
                         matched.push({ name: entry.preview, path: "", exec: "clipboard_copy:" + entry.id, count: 0,
-                            clipboardImage: entry.isImage === true });
+                            clipboardImage: entry.isImage === true,
+                            thumbnailKey: root.thumbnailKey(entry) });
                     }
                 }
                 if (matched.length === 0) matched.push({
@@ -347,7 +379,8 @@ print(json.dumps(res))
                             path: wallpaper.path,
                             exec: wallpaper.exec,
                             count: 0,
-                            clipboardImage: false
+                            clipboardImage: false,
+                            thumbnailKey: ""
                         });
                     }
                 }
@@ -391,6 +424,7 @@ print(json.dumps(res))
         let limit = Math.min(matched.length, 50)
         for (let i = 0; i < limit; i++) {
             matched[i].clipboardImage = matched[i].clipboardImage === true;
+            matched[i].thumbnailKey = matched[i].thumbnailKey || "";
             appListModel.append(matched[i])
         }
 
@@ -607,15 +641,21 @@ with open(path, 'w') as f:
                     required property int index
 
                     readonly property bool hasClipboardImage: model.clipboardImage === true
-                    property string clipboardImageSource: ""
+                    readonly property string clipboardImageSource: root.clipboardThumbnails[model.thumbnailKey] || ""
+                    property string thumbnailDatabase: ""
+
+                    Component.onCompleted: {
+                        thumbnailDatabase = root.clipboardDatabaseKey;
+                        if (hasClipboardImage && !clipboardImageSource) thumbnailProcess.running = true;
+                    }
 
                     Process {
-                        running: hasClipboardImage
-                        command: ["python3", root.clipboardScript, "preview",
+                        id: thumbnailProcess
+                        command: [root.clipboardPreviewPython, root.clipboardScript, "preview",
                             model.exec.slice("clipboard_copy:".length)]
                         stdout: SplitParser {
                             onRead: data => {
-                                try { clipboardImageSource = JSON.parse(data).source; }
+                                try { root.rememberClipboardThumbnail(model.thumbnailKey, JSON.parse(data).source, thumbnailDatabase); }
                                 catch (error) { console.warn("Clipboard thumbnail: " + error); }
                             }
                         }

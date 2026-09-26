@@ -87,6 +87,8 @@ Put a wallpaper at `~/Pictures/Wallpapers/wallpaper.png`, or choose an image fro
 
 One selection updates every display. A single color extractor updates the Quickshell theme as soon as it finishes; selecting another wallpaper cancels the previous extraction and ignores stale results.
 
+Wallpaper accents are cached for up to 128 images in `~/.cache/quickshell_wallpaper_colors.json`. Switching back to an unchanged image reuses its accent without importing Pillow or decoding the image. Modified or replaced files are recalculated automatically; the cache survives Quickshell restarts.
+
 Hyprland's active border gradient, muted inactive border, and shadow tint follow the same accent. Changes apply live through `hyprctl eval`; the saved palette in `~/.cache/hyprland_colors.txt` is restored by `hypr/modules/lookandfeel/theme.lua` on startup and configuration reload.
 
 Generate the initial theme files used by Quickshell and Hyprlock:
@@ -183,7 +185,13 @@ After copying the updated configs, restart Quickshell to enable recording in the
 
 History is refreshed each time you open the clipboard submenu. Entries are shown newest first; search narrows the list to at most 49 matches.
 
+Image previews use Pillow from the same `~/.cache/quickshell_venv` environment as wallpaper colors. Up to 64 small thumbnails are cached in memory while Quickshell runs, so reopening history avoids decoding those images again. Removed entries are pruned, and replacing the history database invalidates the cache. Copying still uses the original image bytes.
+
 ### Bar
+
+Speaker and microphone controls use Quickshell's native PipeWire service. Volume and mute state update when they change, with one shared tracker for all displays. Click to toggle mute; scroll to adjust volume in 5% steps, capped at 100%. Controls follow the default devices and are disabled while a device is unavailable.
+
+The clock uses a shared native `SystemClock` at minute precision, without spawning commands or polling every second.
 
 The music section shows the active MPRIS player's track and artist, with previous, play/pause, and next controls. Click the track to open its player; right-click it to switch between players. It disappears when no player is available, and unsupported controls are disabled.
 
