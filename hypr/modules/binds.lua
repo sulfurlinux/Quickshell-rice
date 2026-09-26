@@ -13,6 +13,7 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(programs.menu))
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("qs ipc call launcher clipboard"))
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd(programs.editor))
 
 -- Window management.

@@ -29,6 +29,12 @@ PanelWindow {
     property var appHistory: ({})
     property var wallpapers: []
     property bool wallpapersLoaded: false
+    property var clipboardEntries: []
+    property bool clipboardLoaded: false
+    property string clipboardError: ""
+    readonly property string clipboardScript: decodeURIComponent(
+        Qt.resolvedUrl("clipboard.py").toString().replace(/^file:\/\//, ""))
+    readonly property bool inClipboardMenu: /^\/clipboard(?:\s|$)/.test(searchInput.text.toLowerCase().trim())
     readonly property int resultsHeight: {
         let total = 0;
         for (let i = 0; i < appListModel.count; i++) {
@@ -56,6 +62,7 @@ PanelWindow {
     ]
 
     property var systemCommands: [
+        { name: "/clipboard", exec: "list_clipboard", desc: "Clipboard history" },
         { name: "/power", exec: "list_power_actions", desc: "Power and session actions" },
         { name: "/wallpaper", exec: "list_wallpapers", desc: "Select a wallpaper" }
     ]
@@ -66,6 +73,55 @@ PanelWindow {
 
     Process { id: execProcess }
     Process { id: saveHistoryProcess }
+
+    function openClipboard() {
+        root.visible = true;
+        root.clipboardLoaded = false;
+        root.clipboardError = "";
+        searchInput.text = "/clipboard ";
+        root.filterApps();
+        Qt.callLater(() => { if (root.visible) searchInput.forceActiveFocus(); });
+    }
+
+    Process {
+        id: loadClipboardProcess
+        command: ["python3", root.clipboardScript, "list"]
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    const result = JSON.parse(data);
+                    root.clipboardEntries = result.entries;
+                    root.clipboardError = result.error;
+                    root.clipboardLoaded = true;
+                    if (root.inClipboardMenu) root.filterApps();
+                } catch (error) {
+                    root.clipboardLoaded = true;
+                    root.clipboardError = "Could not read clipboard history";
+                    if (root.inClipboardMenu) root.filterApps();
+                    console.warn("Could not read clipboard history: " + error);
+                }
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                root.clipboardLoaded = true;
+                root.clipboardError = "Could not load clipboard history";
+                if (root.inClipboardMenu) root.filterApps();
+            }
+        }
+    }
+
+    Process {
+        id: restoreClipboardProcess
+        stderr: SplitParser { onRead: data => console.warn("Clipboard: " + data) }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) root.visible = false;
+            else {
+                root.clipboardError = "Could not restore clipboard entry";
+                if (root.inClipboardMenu) root.filterApps();
+            }
+        }
+    }
 
     function resetScroll() {
         appList.currentIndex = appList.count > 0 ? 0 : -1
@@ -180,7 +236,25 @@ print(json.dumps(res))
 
         let matched = []
 
-        if (/^\/power(?:\s|$)/.test(query)) {
+        if (/^\/clipboard(?:\s|$)/.test(query)) {
+            if (!clipboardLoaded && !loadClipboardProcess.running) loadClipboardProcess.running = true;
+            const clipboardFilter = query.slice("/clipboard".length).trim();
+            if (!clipboardLoaded || clipboardError) {
+                matched.push({ name: clipboardError || "Loading clipboard history…", path: "", exec: "", count: 0 });
+            } else {
+                for (let i = 0; i < clipboardEntries.length && matched.length < 49; i++) {
+                    const entry = clipboardEntries[i];
+                    if (entry.preview.toLowerCase().includes(clipboardFilter)) {
+                        matched.push({ name: entry.preview, path: "", exec: "clipboard_copy:" + entry.id, count: 0 });
+                    }
+                }
+                if (matched.length === 0) matched.push({
+                    name: clipboardEntries.length === 0 ? "Clipboard history is empty" : "No matching clipboard entries",
+                    path: "", exec: "", count: 0
+                });
+            }
+            matched.push({ name: "← Back to commands", path: "", exec: "power_back", count: 0 });
+        } else if (/^\/power(?:\s|$)/.test(query)) {
             const powerFilter = query.slice("/power".length).trim();
             for (let i = 0; i < powerCommands.length; i++) {
                 const cmd = powerCommands[i];
@@ -258,6 +332,18 @@ print(json.dumps(res))
     function launchApp(appName, execCmd) {
         if (!execCmd || execCmd.trim() === "") return;
 
+        if (execCmd === "list_clipboard") {
+            root.openClipboard();
+            return;
+        }
+        if (execCmd.startsWith("clipboard_copy:")) {
+            const identifier = execCmd.slice("clipboard_copy:".length);
+            if (!/^\d+$/.test(identifier) || restoreClipboardProcess.running) return;
+            restoreClipboardProcess.command = ["python3", root.clipboardScript, "copy", identifier];
+            restoreClipboardProcess.running = true;
+            return;
+        }
+
         if (execCmd === "list_power_actions") {
             searchInput.text = "/power ";
             searchInput.forceActiveFocus();
@@ -323,6 +409,8 @@ with open(path, 'w') as f:
         if (visible) {
             root.focusScreen()
             root.wallpapersLoaded = false
+            root.clipboardLoaded = false
+            root.clipboardError = ""
             searchInput.text = ""
             loadHistoryProcess.running = true
             if (allApps.length === 0) {
@@ -407,7 +495,7 @@ with open(path, 'w') as f:
                         Keys.onUpPressed: root.moveSelection(-1)
 
                         Keys.onEscapePressed: {
-                            if (root.inPowerMenu) searchInput.text = "/";
+                            if (root.inPowerMenu || root.inClipboardMenu) searchInput.text = "/";
                             else root.visible = false;
                         }
 
@@ -485,7 +573,8 @@ with open(path, 'w') as f:
 
                             Text {
                                 anchors.centerIn: parent
-                                text: model.path === undefined || model.path === "" ? (model.name.startsWith("/") ? "" : "󱓞") : ""
+                                text: model.path === undefined || model.path === ""
+                                    ? (model.exec.startsWith("clipboard_copy:") ? "󰅍" : (model.name.startsWith("/") ? "" : "󱓞")) : ""
                                 color: resultLabel.color
                                 font.pixelSize: 14
                                 visible: model.path === undefined || model.path === ""
@@ -496,6 +585,7 @@ with open(path, 'w') as f:
                             id: resultLabel
                             Layout.fillWidth: true
                             text: (model.path !== undefined && model.path !== "") ? model.name : model.name
+                            textFormat: Text.PlainText
                             color: isSelected
                                 ? (theme ? theme.background : "#1e1e2e")
                                 : (theme ? theme.text : "#cdd6f4")

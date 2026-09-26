@@ -29,7 +29,7 @@ Install the applications used by the setup, plus screenshot, audio, brightness, 
 ```bash
 sudo pacman -S --needed quickshell ghostty hyprlock fish fastfetch \
   ttf-jetbrains-mono-nerd nautilus zed starship firefox \
-  grim slurp hyprpicker wl-clipboard util-linux wireplumber brightnessctl playerctl python \
+  grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl python \
   xorg-xrandr git base-devel
 ```
 
@@ -153,6 +153,7 @@ Run `hyprctl reload` after editing. Start a new Hyprland session to see each dis
 | Shortcut                      | Action                                                          |
 | ----------------------------- | --------------------------------------------------------------- |
 | `Super + Space`               | Toggle the launcher                                             |
+| `Super + Shift + V`           | Open clipboard history                                          |
 | `Super + N`                   | Toggle the notification center                                  |
 | `Print`                       | Select a screenshot area, save it, and copy it to the clipboard |
 | `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor             |
@@ -162,6 +163,27 @@ Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallp
 
 All power and session actions run immediately without a confirmation dialog.
 
+### Clipboard history
+
+Clipboard history uses [cliphist](https://github.com/sentriz/cliphist) and records text and images automatically when a new Hyprland session starts. Open it with `Super + Shift + V`, or type `/clipboard` in the launcher. Type after `/clipboard` to search entry previews; use the arrow keys and Enter, or click an entry, to restore it to the clipboard. Paste it in the target app as usual. Images show descriptive previews rather than thumbnails. Escape or “Back to commands” returns to launcher commands.
+
+For an existing installation, install the new dependencies:
+
+```bash
+sudo pacman -S --needed cliphist wl-clipboard xdg-utils
+```
+
+After copying the updated configs, start a new Hyprland session to enable recording. To start recording in the current session instead, run these once in Bash:
+
+```bash
+wl-paste --type text --watch cliphist store &
+wl-paste --type image --watch cliphist store &
+```
+
+History is refreshed each time you open the clipboard submenu. Entries are shown newest first; search narrows the list to at most 49 matches.
+
+### Notifications and screenshots
+
 The notification center shows arrival timestamps. Use its **DND on/off** button to suppress notification popups while keeping them in history. Turning DND off resumes new popups without replaying earlier notifications.
 
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
@@ -169,7 +191,7 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 ## Roadmap
 
 - [x] Add Screenshot Utility
-- [ ] Clipboard
+- [x] Clipboard
 - [x] Cursor
 - [x] Fancy Text cursor in the Terminal
 - [x] Logout menu

@@ -68,6 +68,10 @@ if os.path.exists(path):
         function toggle(): void {
             globalLauncher.visible = !globalLauncher.visible
         }
+
+        function clipboard(): void {
+            globalLauncher.openClipboard()
+        }
     }
 
     IpcHandler {
