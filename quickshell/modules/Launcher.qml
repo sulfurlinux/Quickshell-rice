@@ -369,9 +369,33 @@ with open(path, 'w') as f:
             wrapMode: Text.WordWrap
         }
         footer: DialogButtonBox {
+            padding: 16
+            spacing: 8
+            background: Item {}
+
             Button {
                 id: cancelPowerAction
                 text: "Cancel"
+                implicitWidth: Math.max(96, implicitContentWidth + 24)
+                implicitHeight: 36
+                contentItem: Text {
+                    text: cancelPowerAction.text
+                    color: theme ? theme.text : "#cdd6f4"
+                    font: cancelPowerAction.font
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    radius: 6
+                    color: cancelPowerAction.down
+                        ? Qt.darker(theme ? theme.surface : "#313244", 1.15)
+                        : cancelPowerAction.hovered
+                            ? Qt.lighter(theme ? theme.surface : "#313244", 1.15)
+                            : (theme ? theme.surface : "#313244")
+                    border.width: 1
+                    border.color: cancelPowerAction.visualFocus
+                        ? (theme ? theme.accent : "#cba6f7") : "transparent"
+                }
                 DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
                 Keys.onReturnPressed: powerConfirmation.reject()
                 Keys.onEnterPressed: powerConfirmation.reject()
@@ -379,6 +403,26 @@ with open(path, 'w') as f:
             Button {
                 id: confirmPowerButton
                 text: root.pendingPowerAction ? root.pendingPowerAction.label : "Confirm"
+                implicitWidth: Math.max(96, implicitContentWidth + 24)
+                implicitHeight: 36
+                contentItem: Text {
+                    text: confirmPowerButton.text
+                    color: theme ? theme.background : "#1e1e2e"
+                    font: confirmPowerButton.font
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    radius: 6
+                    color: confirmPowerButton.down
+                        ? Qt.darker(theme ? theme.accent : "#cba6f7", 1.15)
+                        : confirmPowerButton.hovered
+                            ? Qt.lighter(theme ? theme.accent : "#cba6f7", 1.1)
+                            : (theme ? theme.accent : "#cba6f7")
+                    border.width: 1
+                    border.color: confirmPowerButton.visualFocus
+                        ? (theme ? theme.text : "#cdd6f4") : "transparent"
+                }
                 DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
                 Keys.onReturnPressed: powerConfirmation.accept()
                 Keys.onEnterPressed: powerConfirmation.accept()
