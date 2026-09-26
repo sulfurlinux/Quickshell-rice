@@ -165,7 +165,7 @@ All power and session actions run immediately without a confirmation dialog.
 
 ### Clipboard history
 
-Clipboard history uses [cliphist](https://github.com/sentriz/cliphist) and records text and images automatically when a new Hyprland session starts. Open it with `Super + Shift + V`, or type `/clipboard` in the launcher. Type after `/clipboard` to search entry previews; use the arrow keys and Enter, or click an entry, to restore it to the clipboard. Paste it in the target app as usual. Images show descriptive previews rather than thumbnails. Escape or “Back to commands” returns to launcher commands.
+Clipboard history uses [cliphist](https://github.com/sentriz/cliphist) and records text and images automatically while Quickshell is running. Open it with `Super + Shift + V`, or type `/clipboard` in the launcher. Type after `/clipboard` to search entry previews; use the arrow keys and Enter, or click an entry, to restore it to the clipboard. Paste it in the target app as usual. Images show descriptive previews rather than thumbnails. Escape or “Back to commands” returns to launcher commands.
 
 For an existing installation, install the new dependencies:
 
@@ -173,12 +173,7 @@ For an existing installation, install the new dependencies:
 sudo pacman -S --needed cliphist wl-clipboard xdg-utils
 ```
 
-After copying the updated configs, start a new Hyprland session to enable recording. To start recording in the current session instead, run these once in Bash:
-
-```bash
-wl-paste --type text --watch cliphist store &
-wl-paste --type image --watch cliphist store &
-```
+After copying the updated configs, restart Quickshell to enable recording in the current session. Quickshell manages both clipboard watchers; no separate startup commands are needed. Recorder failures and full clipboard errors appear in the Quickshell logs.
 
 History is refreshed each time you open the clipboard submenu. Entries are shown newest first; search narrows the list to at most 49 matches.
 

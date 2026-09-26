@@ -59,6 +59,28 @@ if os.path.exists(path):
         theme: root.currentTheme
     }
 
+    Process {
+        command: ["wl-paste", "--type", "text", "--watch", "cliphist", "store"]
+        running: true
+        stderr: SplitParser {
+            onRead: data => console.warn("Clipboard text recorder: " + data)
+        }
+        onExited: (exitCode, exitStatus) => {
+            console.warn("Clipboard text recorder stopped (exit " + exitCode + ")")
+        }
+    }
+
+    Process {
+        command: ["wl-paste", "--type", "image", "--watch", "cliphist", "store"]
+        running: true
+        stderr: SplitParser {
+            onRead: data => console.warn("Clipboard image recorder: " + data)
+        }
+        onExited: (exitCode, exitStatus) => {
+            console.warn("Clipboard image recorder stopped (exit " + exitCode + ")")
+        }
+    }
+
     Rice.Notifications {
         id: notificationCenter
         theme: root.currentTheme
