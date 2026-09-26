@@ -1,17 +1,6 @@
 # Quickshell-rice
 A personal Linux rice using Arch, Hyprland and Quickshell.
 
-## Todo
-- Hyprctl kill
-- Add timestamps and a do not disturb to the notification center
-- Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
-- Fix the Workspace order
-- Freeze the screen when Screenshotting
-- Fix the screenshot utility white background stacking
-- Fix the Launcher buging when the cursor is inside the window
-- make the louncher icons use the text color
-- Fix the Launcher Scaling
-
 ## Install
 1. Make sure you got the dependencies installed. (This comand was written for Arch, if you use another Distro you will have to install them manuely.)
 ```
@@ -64,6 +53,17 @@ mkdir /home/$USER/Videos
 ```
 hyprctl reload
 ```
+
+## Todo
+- Hyprctl kill
+- Add timestamps and a do not disturb to the notification center
+- Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
+- Fix the Workspace order
+- Freeze the screen when Screenshotting
+- Fix the screenshot utility white background stacking
+- Fix the Launcher buging when the cursor is inside the window
+- make the louncher icons use the text color
+- Fix the Launcher Scaling
 
 ## Roadmap
 - [x] Add Screenshot Utility
