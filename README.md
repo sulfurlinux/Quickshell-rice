@@ -55,7 +55,6 @@ hyprctl reload
 ```
 
 ## Todo
-- Hyprctl kill
 - Add timestamps and a do not disturb to the notification center
 - Split Shutdown, Reboot etc into a submenu in the /Luncher!!!
 - Fix the Workspace order
