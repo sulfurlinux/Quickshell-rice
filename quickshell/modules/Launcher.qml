@@ -317,6 +317,15 @@ with open(path, 'w') as f:
         color: theme ? theme.background : "#1e1e2e"
         border.color: theme ? theme.accent : "#cba6f7"
         border.width: 2
+        clip: true
+
+        Behavior on height {
+            enabled: root.visible
+            NumberAnimation {
+                duration: 140
+                easing.type: Easing.OutCubic
+            }
+        }
 
         MouseArea {
             anchors.fill: parent

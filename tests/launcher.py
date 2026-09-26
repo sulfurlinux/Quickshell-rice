@@ -63,7 +63,7 @@ QtObject { signal read(string data) }
         return result.toVariant() if hasattr(result, "toVariant") else result
 
     def settle():
-        QTest.qWait(30)
+        QTest.qWait(180)
 
     apps = [{"name": f"App {index:02}", "exec": f"test-app-{index}"} for index in range(40)]
     evaluate(f"root.allApps = {json.dumps(apps)}; root.visible = true; root.filterApps()")
@@ -87,6 +87,9 @@ QtObject { signal read(string data) }
     assert evaluate("appList.currentIndex") == 0
     assert evaluate("appList.contentY === appList.originY")
     evaluate("searchInput.text = 'no matching app'")
+    QTest.qWait(40)
+    assert 74 < evaluate("launcherCard.height") < 460
+    settle()
     assert evaluate("appList.count") == 0
     assert evaluate("appList.currentIndex") == -1
     assert evaluate("launcherCard.height") == 74
@@ -98,6 +101,7 @@ QtObject { signal read(string data) }
     evaluate("searchInput.text = 'App 01'")
     wallpaper = [{"name": "forest.png", "path": "", "exec": "wallpaper_select:/forest.png"}]
     evaluate(f"acceptWallpapers({json.dumps(json.dumps(wallpaper))})")
+    settle()
     assert evaluate("appListModel.get(0).name") == "App 01"
     assert evaluate("launcherCard.height") == 126
     evaluate("searchInput.text = '/wallpaper forest'")
