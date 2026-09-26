@@ -86,7 +86,7 @@ Scope {
 
     PanelWindow {
         id: popupWindow
-        visible: !root.doNotDisturb && popupColumn.implicitHeight > 0
+        visible: !root.doNotDisturb
 
         screen: Quickshell.screens.primary
 
@@ -283,9 +283,7 @@ Scope {
                     Button {
                         id: dndButton
                         text: root.doNotDisturb ? "DND on" : "DND off"
-                        checkable: true
-                        checked: root.doNotDisturb
-                        onToggled: root.doNotDisturb = checked
+                        onClicked: root.doNotDisturb = !root.doNotDisturb
                         implicitWidth: implicitContentWidth + 20
                         implicitHeight: 28
                         Accessible.name: "Do not disturb"
