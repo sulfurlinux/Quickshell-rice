@@ -175,6 +175,16 @@ The launcher reuses [Quickshell's desktop entry registry](https://quickshell.org
 
 Search updates only changed result rows, and scrolling reuses row components. Clipboard previews refresh when reused rows change entries. App usage history is loaded once per Quickshell session and saved asynchronously with atomic writes through [FileView](https://quickshell.org/docs/v0.2.1/types/Quickshell.Io/FileView/), without starting Python. The existing `~/.cache/quickshell_app_history.json` file and usage ranking are preserved.
 
+App names and commands are normalized once when the registry changes, rather than on every keystroke. Clipboard preview requests prioritize rows currently visible in the launcher; priority is recalculated before each decode, and requests for filtered-out entries are discarded.
+
+To measure performance on your Linux desktop, run:
+
+```sh
+python3 ~/.config/quickshell/modules/profile_shell.py
+```
+
+Follow the three prompts for 15 seconds each: idle, launcher search, and wallpaper switching. The profiler reports average and peak CPU usage plus peak resident memory for Quickshell and its sampled child processes. Samples are saved to `~/.cache/quickshell-profile.csv`. Use `--pid PID` if multiple Quickshell instances are running, or `--seconds 30` for longer phases. CPU usage of 100% means one fully used core; summed resident memory includes shared pages, and processes that exit between samples may be missed. Run the same actions before and after a change to compare performance; this measures process load rather than animation frame timing.
+
 Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
 
 All power and session actions run immediately without a confirmation dialog.

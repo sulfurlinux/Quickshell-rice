@@ -30,7 +30,8 @@ PanelWindow {
     readonly property var allApps: DesktopEntries.applications.values.map(entry => ({
         name: entry.name,
         exec: "desktop_entry:" + entry.id,
-        search: entry.command.join(" ")
+        searchName: entry.name.toLowerCase(),
+        searchCommand: entry.command.join(" ").toLowerCase()
     }))
     onAllAppsChanged: {
         if (root.visible && !searchInput.text.trim().startsWith("/")) root.filterApps();
@@ -123,14 +124,27 @@ PanelWindow {
         root.thumbnailQueue = root.thumbnailQueue.concat([{
             id: identifier, key: key, database: root.clipboardDatabaseKey
         }]);
-        root.pumpThumbnailQueue();
+        Qt.callLater(root.pumpThumbnailQueue);
     }
 
     function pumpThumbnailQueue() {
         if (root.thumbnailRequest || !root.visible || !root.inClipboardMenu) return;
+        const currentKeys = [];
+        const visibleKeys = [];
+        for (let i = 0; i < appListModel.count; i++) {
+            const row = appListModel.get(i);
+            if (!row.clipboardImage) continue;
+            currentKeys.push(row.thumbnailKey);
+            const item = appList.itemAtIndex(i);
+            if (item && item.previewVisible) visibleKeys.push(row.thumbnailKey);
+        }
         root.thumbnailQueue = root.thumbnailQueue.filter(request =>
             request.database === root.clipboardDatabaseKey && !root.clipboardThumbnails[request.key]
+            && currentKeys.includes(request.key)
             && root.clipboardEntries.some(entry => root.thumbnailKey(entry) === request.key));
+        // Re-evaluate priority before every decode, including after scrolling.
+        root.thumbnailQueue = root.thumbnailQueue.slice().sort((a, b) =>
+            Number(visibleKeys.includes(b.key)) - Number(visibleKeys.includes(a.key)));
         if (root.thumbnailQueue.length === 0) return;
         if (!thumbnailWorker.running) {
             thumbnailWorker.running = true;
@@ -518,7 +532,7 @@ PanelWindow {
         } else {
             for (let i = 0; i < allApps.length; i++) {
                 let app = allApps[i]
-                if (query === "" || app.name.toLowerCase().includes(query) || app.search.toLowerCase().includes(query)) {
+                if (query === "" || app.searchName.includes(query) || app.searchCommand.includes(query)) {
                     let usageCount = root.appHistory[app.name] || 0
                     matched.push({
                         name: app.name,
@@ -749,6 +763,8 @@ PanelWindow {
                     readonly property string clipboardImageSource: root.clipboardThumbnails[model.thumbnailKey] || ""
                     readonly property string previewKey: model.thumbnailKey
                     property bool pooled: false
+                    readonly property bool previewVisible: root.visible && !pooled
+                        && y + height > appList.contentY && y < appList.contentY + appList.height
                     function refreshPreview() {
                         if (!pooled && hasClipboardImage && !clipboardImageSource)
                             root.requestClipboardThumbnail(model.exec.slice("clipboard_copy:".length), model.thumbnailKey);
@@ -756,6 +772,7 @@ PanelWindow {
                     Component.onCompleted: Qt.callLater(refreshPreview)
                     onPreviewKeyChanged: Qt.callLater(refreshPreview)
                     onHasClipboardImageChanged: Qt.callLater(refreshPreview)
+                    onPreviewVisibleChanged: if (previewVisible) Qt.callLater(refreshPreview)
                     onClipboardImageSourceChanged: {
                         if (!clipboardImageSource) Qt.callLater(refreshPreview);
                     }
