@@ -234,9 +234,10 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - [x] Cursor
 - [x] Fancy Text cursor in the Terminal
 - [x] Logout menu
-- [x] Launcher
+- [ ] Launcher
   - [x] App Launcher
   - [x] pkiller
+  - [ ] Integratated Calculator
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [x] Dynamic theme system
