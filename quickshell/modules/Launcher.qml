@@ -258,6 +258,7 @@ PanelWindow {
     ]
 
     property var systemCommands: [
+        { name: "/calc", exec: "calculator", desc: "Calculate an expression" },
         { name: "/clipboard", exec: "list_clipboard", desc: "Clipboard history" },
         { name: "/pkill", exec: "list_running_apps", desc: "Terminate a running app" },
         { name: "/power", exec: "list_power_actions", desc: "Power and session actions" },
@@ -266,6 +267,97 @@ PanelWindow {
 
     ListModel {
         id: appListModel
+    }
+
+    function calculate(expression) {
+        const compact = expression.replace(/\s+/g, "");
+        if (!compact) return { error: "Enter an expression" };
+        if (compact.length > 240) return { error: "Expression is too long" };
+        const tokens = expression.match(/\s*(\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?|[A-Za-z_]+|.)/g) || [];
+        if (tokens.join("").replace(/\s+/g, "") !== compact)
+            return { error: "Invalid expression" };
+        const values = tokens.map(token => token.trim());
+        let position = 0;
+        const functions = {
+            abs: Math.abs, ceil: Math.ceil, floor: Math.floor,
+            round: Math.round, sqrt: Math.sqrt, sin: Math.sin,
+            cos: Math.cos, tan: Math.tan, log: Math.log,
+            ln: Math.log, log10: Math.log10, min: Math.min, max: Math.max
+        };
+        function primary() {
+            const token = values[position++];
+            if (token === undefined) throw new Error("Expected a number");
+            if (token === "(") {
+                const value = expressionValue();
+                if (values[position++] !== ")") throw new Error("Missing )");
+                return value;
+            }
+            if (/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(token))
+                return Number(token);
+            if (/^[A-Za-z_]+$/.test(token)) {
+                const name = token.toLowerCase();
+                if (name === "pi") return Math.PI;
+                if (name === "e") return Math.E;
+                if (!Object.prototype.hasOwnProperty.call(functions, name))
+                    throw new Error("Unknown function or constant: " + token);
+                if (values[position++] !== "(") throw new Error("Expected ( after " + token);
+                const args = [];
+                if (values[position] !== ")") {
+                    args.push(expressionValue());
+                    while (values[position] === ",") {
+                        position++;
+                        args.push(expressionValue());
+                    }
+                }
+                if (values[position++] !== ")") throw new Error("Missing )");
+                if ((name === "min" || name === "max") && args.length > 0)
+                    return name === "min" ? Math.min(...args) : Math.max(...args);
+                if (args.length !== 1) throw new Error(token + " takes one argument");
+                return functions[name](args[0]);
+            }
+            throw new Error("Expected a number");
+        }
+        function power() {
+            const left = primary();
+            if (values[position] === "^") {
+                position++;
+                return Math.pow(left, unary());
+            }
+            return left;
+        }
+        function unary() {
+            if (values[position] === "+") { position++; return unary(); }
+            if (values[position] === "-") { position++; return -unary(); }
+            return power();
+        }
+        function term() {
+            let value = unary();
+            while (["*", "/", "%"].includes(values[position])) {
+                const operator = values[position++];
+                const right = unary();
+                if (operator === "*") value *= right;
+                else if (operator === "/") value /= right;
+                else value %= right;
+            }
+            return value;
+        }
+        function expressionValue() {
+            let value = term();
+            while (["+", "-"].includes(values[position])) {
+                const operator = values[position++];
+                const right = term();
+                value = operator === "+" ? value + right : value - right;
+            }
+            return value;
+        }
+        try {
+            const value = expressionValue();
+            if (position !== values.length) throw new Error("Unexpected token: " + values[position]);
+            if (!Number.isFinite(value)) throw new Error("Result is not finite");
+            return { value: Number(value.toPrecision(12)).toString() };
+        } catch (error) {
+            return { error: error.message || "Invalid expression" };
+        }
     }
 
     function resultKey(row) {
@@ -452,7 +544,20 @@ PanelWindow {
 
         let matched = []
 
-        if (root.inKillMenu) {
+        if (query.startsWith("=") || /^\/calc(?:\s|$)/.test(query)) {
+            const expression = query.startsWith("=") ? query.slice(1).trim()
+                : query.slice("/calc".length).trim();
+            if (expression) {
+                const result = root.calculate(expression);
+                matched.push(result.value !== undefined
+                    ? { name: "= " + expression + "  →  " + result.value,
+                        path: "", exec: "calculator_copy:" + result.value, count: 0 }
+                    : { name: "Calculator: " + result.error,
+                        path: "", exec: "", count: 0 });
+            } else {
+                matched.push({ name: "Type an expression after /calc or =", path: "", exec: "", count: 0 });
+            }
+        } else if (root.inKillMenu) {
             if (!runningAppsLoaded && !loadRunningAppsProcess.running) loadRunningAppsProcess.running = true;
             const appFilter = query.slice("/pkill".length).trim();
             if (!runningAppsLoaded || runningAppsError) {
@@ -577,6 +682,18 @@ PanelWindow {
             searchInput.text = "/pkill ";
             searchInput.forceActiveFocus();
             root.filterApps();
+            return;
+        }
+        if (execCmd.startsWith("calculator_copy:")) {
+            const value = execCmd.slice("calculator_copy:".length);
+            if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value)) return;
+            Quickshell.execDetached({ command: ["wl-copy", value] });
+            root.visible = false;
+            return;
+        }
+        if (execCmd === "calculator") {
+            searchInput.text = "/calc ";
+            searchInput.forceActiveFocus();
             return;
         }
         if (execCmd.startsWith("pkill_app:")) {

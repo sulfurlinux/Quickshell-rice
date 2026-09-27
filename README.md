@@ -169,7 +169,7 @@ Run `hyprctl reload` after editing. Start a new Hyprland session to see each dis
 | `Super + Q` / `W` / `E` / `Z` | Open the terminal / browser / file manager / editor             |
 | `Super + Shift + R`           | Reload Hyprland and restart Quickshell                          |
 
-Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, or `/power` to open the shutdown, restart, lock, and logout submenu. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
+Screenshots are saved in `~/Pictures/Screenshots`. In the launcher, type `/wallpaper` to choose an image, `/power` to open the shutdown, restart, lock, and logout submenu, or `/calc` followed by an expression to calculate. Calculator expressions also work with an `=` prefix, such as `=sqrt(81)`. Arithmetic, parentheses, powers, modulo, constants `pi` and `e`, and functions `abs`, `ceil`, `floor`, `round`, `sqrt`, `sin`, `cos`, `tan`, `log`, `ln`, `log10`, `min`, and `max` are supported. Select a result or press Enter to copy it. Type after `/power` to filter its actions. Press `Escape` or choose “Back to commands” to return. The `/shutdown`, `/reboot`, `/lock`, and `/logout` shortcuts still work directly.
 
 The launcher reuses [Quickshell's desktop entry registry](https://quickshell.org/docs/v0.2.1/types/Quickshell/DesktopEntries/), which updates when desktop files change. Wallpaper lists are indexed on first use and kept current by [Qt's folder watcher](https://doc.qt.io/qt-6/qml-qt-labs-folderlistmodel-folderlistmodel.html). Reopening the launcher or wallpaper menu does not start Python to rebuild these lists.
 
@@ -234,10 +234,10 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - [x] Cursor
 - [x] Fancy Text cursor in the Terminal
 - [x] Logout menu
-- [ ] Launcher
+- [x] Launcher
   - [x] App Launcher
   - [x] pkiller
-  - [ ] Integratated Calculator
+  - [x] Integratated Calculator
 - [x] Wallpaper system
   - [x] Wallpaper switcher in launcher
 - [x] Dynamic theme system
