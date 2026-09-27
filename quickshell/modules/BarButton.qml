@@ -10,6 +10,9 @@ Rectangle {
     radius: 4
     color: "transparent"
     opacity: enabled ? 1 : 0.35
+    scale: pointer.pressed ? 0.92 : 1
+    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    Behavior on opacity { NumberAnimation { duration: 150 } }
     Text {
         anchors.centerIn: parent
         text: root.label

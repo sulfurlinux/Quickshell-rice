@@ -114,6 +114,16 @@ PanelWindow {
     property var thumbnailQueue: []
     property var thumbnailRequest: null
     property bool thumbnailWorkerReady: false
+    property bool thumbnailWorkerStopping: false
+
+    Timer {
+        interval: 30000
+        running: !root.visible && !root.thumbnailRequest && thumbnailWorker.running
+        onTriggered: {
+            root.thumbnailWorkerStopping = true;
+            thumbnailWorker.running = false;
+        }
+    }
 
     function requestClipboardThumbnail(identifier, key) {
         if (root.clipboardThumbnails[key]
@@ -161,6 +171,7 @@ PanelWindow {
         command: [root.clipboardPreviewPython, "-u", root.clipboardScript, "preview-worker"]
         stdinEnabled: true
         onStarted: {
+            root.thumbnailWorkerStopping = false;
             root.thumbnailWorkerReady = true;
             root.pumpThumbnailQueue();
         }
@@ -179,7 +190,8 @@ PanelWindow {
             root.thumbnailWorkerReady = false;
             root.thumbnailRequest = null;
             root.thumbnailQueue = [];
-            if (exitCode !== 0) console.warn("Clipboard thumbnail worker stopped (exit " + exitCode + ")");
+            if (exitCode !== 0 && !root.thumbnailWorkerStopping)
+                console.warn("Clipboard thumbnail worker stopped (exit " + exitCode + ")");
         }
     }
 
@@ -645,9 +657,13 @@ PanelWindow {
             filterApps()
             root.resetScroll()
             Qt.callLater(() => {
-                if (root.visible) searchInput.forceActiveFocus();
+                if (root.visible) {
+                    searchInput.forceActiveFocus();
+                    launcherEntrance.restart();
+                }
             })
         } else {
+            launcherEntrance.stop();
             root.thumbnailQueue = [];
         }
     }
@@ -655,6 +671,26 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         onClicked: root.visible = false
+    }
+
+    ParallelAnimation {
+        id: launcherEntrance
+        NumberAnimation {
+            target: launcherCard
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 150
+            easing.type: Easing.OutCubic
+        }
+        NumberAnimation {
+            target: launcherCard
+            property: "scale"
+            from: 0.98
+            to: 1
+            duration: 150
+            easing.type: Easing.OutCubic
+        }
     }
 
     Rectangle {
@@ -668,11 +704,13 @@ PanelWindow {
         border.color: theme ? theme.accent : "#cba6f7"
         border.width: 2
         clip: true
+        Behavior on color { enabled: root.visible; ColorAnimation { duration: 180 } }
+        Behavior on border.color { enabled: root.visible; ColorAnimation { duration: 180 } }
 
         Behavior on height {
             enabled: root.visible
             NumberAnimation {
-                duration: 140
+                duration: 150
                 easing.type: Easing.OutCubic
             }
         }

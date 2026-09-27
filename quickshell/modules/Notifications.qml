@@ -15,6 +15,7 @@ Scope {
     property var history: []
     property var historyLocks: []
     readonly property int historyLimit: 100
+    readonly property int iconDecodePixels: Math.ceil(24 * (root.targetScreen ? root.targetScreen.devicePixelRatio : 1))
 
     Component {
         id: lockComponent
@@ -117,8 +118,11 @@ Scope {
                 model: server.trackedNotifications
 
                 delegate: Rectangle {
+                    id: popup
                     required property var modelData
                     property bool popupVisible: false
+                    property real reveal: popupVisible ? 1 : 0
+                    Behavior on reveal { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
                     Component.onCompleted: popupVisible = !root.doNotDisturb && !modelData.lastGeneration
                     Connections {
                         target: root
@@ -128,12 +132,14 @@ Scope {
                     }
 
                     Layout.fillWidth: true
-                    implicitHeight: popupVisible ? popupContent.implicitHeight + 24 : 0
+                    implicitHeight: visible ? popupLoader.implicitHeight + 24 : 0
                     radius: 10
                     color: root.theme ? root.theme.surface : "#313244"
                     border.width: 1
                     border.color: root.theme ? root.theme.accent : "#cba6f7"
-                    visible: popupVisible
+                    visible: reveal > 0
+                    opacity: reveal
+                    transform: Translate { x: 12 * (1 - popup.reveal) }
 
                     Timer {
                         interval: root.notificationTimeout
@@ -152,76 +158,82 @@ Scope {
                         }
                     }
 
-                    ColumnLayout {
-                        id: popupContent
-
+                    Loader {
+                        id: popupLoader
+                        active: popup.popupVisible || popup.reveal > 0
                         anchors.fill: parent
                         anchors.margins: 12
-                        spacing: 4
+                        sourceComponent: ColumnLayout {
+                            id: popupContent
+                            width: popupLoader.width
+                            spacing: 4
 
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 8
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 8
 
-                            Image {
-                                Layout.preferredWidth: 24
-                                Layout.preferredHeight: 24
-                                source: modelData.appIcon
-                                    ? Quickshell.iconPath(modelData.appIcon, "application-x-executable")
-                                    : ""
-                                visible: source.length > 0
-                                fillMode: Image.PreserveAspectFit
+                                Image {
+                                    asynchronous: true
+                                    sourceSize: Qt.size(root.iconDecodePixels, root.iconDecodePixels)
+                                    Layout.preferredWidth: 24
+                                    Layout.preferredHeight: 24
+                                    source: modelData.appIcon
+                                        ? Quickshell.iconPath(modelData.appIcon, "application-x-executable")
+                                        : ""
+                                    visible: source.length > 0
+                                    fillMode: Image.PreserveAspectFit
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.appName
+                                    color: root.theme ? root.theme.subtext : "#a6adc8"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    elide: Text.ElideRight
+                                }
+
+                                Rectangle {
+                                    Layout.preferredWidth: 24
+                                    Layout.preferredHeight: 24
+                                    color: "transparent"
+                                    z: 2
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "×"
+                                        color: root.theme ? root.theme.text : "#cdd6f4"
+                                        font.pixelSize: 18
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: modelData.dismiss()
+                                    }
+                                }
                             }
 
                             Text {
                                 Layout.fillWidth: true
-                                text: modelData.appName
-                                color: root.theme ? root.theme.subtext : "#a6adc8"
-                                font.pixelSize: 12
+                                text: modelData.summary
+                                color: root.theme ? root.theme.text : "#cdd6f4"
+                                font.pixelSize: 14
                                 font.bold: true
+                                wrapMode: Text.Wrap
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                visible: text.length > 0
+                                text: modelData.body
+                                color: root.theme ? root.theme.text : "#cdd6f4"
+                                font.pixelSize: 13
+                                wrapMode: Text.Wrap
+                                textFormat: Text.PlainText
+                                maximumLineCount: 4
                                 elide: Text.ElideRight
                             }
-
-                            Rectangle {
-                                Layout.preferredWidth: 24
-                                Layout.preferredHeight: 24
-                                color: "transparent"
-                                z: 2
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "×"
-                                    color: root.theme ? root.theme.text : "#cdd6f4"
-                                    font.pixelSize: 18
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: modelData.dismiss()
-                                }
-                            }
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            text: modelData.summary
-                            color: root.theme ? root.theme.text : "#cdd6f4"
-                            font.pixelSize: 14
-                            font.bold: true
-                            wrapMode: Text.Wrap
-                        }
-
-                        Text {
-                            Layout.fillWidth: true
-                            visible: text.length > 0
-                            text: modelData.body
-                            color: root.theme ? root.theme.text : "#cdd6f4"
-                            font.pixelSize: 13
-                            wrapMode: Text.Wrap
-                            textFormat: Text.PlainText
-                            maximumLineCount: 4
-                            elide: Text.ElideRight
                         }
                     }
                 }
@@ -285,7 +297,7 @@ Scope {
                         id: dndButton
                         text: root.doNotDisturb ? "DND on" : "DND off"
                         onClicked: root.doNotDisturb = !root.doNotDisturb
-                        implicitWidth: implicitContentWidth + 20
+                        implicitWidth: 68
                         implicitHeight: 28
                         Accessible.name: "Do not disturb"
 
@@ -369,7 +381,8 @@ Scope {
                     ListView {
                         id: historyList
 
-                        model: root.history
+                        model: root.centerVisible ? root.history : []
+                        reuseItems: true
                         spacing: 8
 
                         delegate: Rectangle {
@@ -404,6 +417,8 @@ Scope {
                                     spacing: 8
 
                                     Image {
+                                        asynchronous: true
+                                        sourceSize: Qt.size(root.iconDecodePixels, root.iconDecodePixels)
                                         Layout.preferredWidth: 24
                                         Layout.preferredHeight: 24
                                         source: notification.appIcon

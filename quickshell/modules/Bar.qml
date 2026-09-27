@@ -30,6 +30,19 @@ PanelWindow {
 
     implicitHeight: 40
     color: theme ? theme.background : "#1e1e2e"
+    Behavior on color { enabled: root.visible; ColorAnimation { duration: 180 } }
+
+    TextMetrics {
+        id: volumeMetrics
+        font.pixelSize: 12
+        font.bold: true
+        text: "100%"
+    }
+    TextMetrics {
+        id: clockMetrics
+        font: clock.font
+        text: "88:88"
+    }
 
     Timer {
         id: sinkScrollTimer
@@ -52,6 +65,8 @@ PanelWindow {
         Text {
             id: clock
             anchors.centerIn: parent
+            width: clockMetrics.advanceWidth
+            horizontalAlignment: Text.AlignHCenter
             text: root.currentTime
             color: root.theme ? root.theme.text : "#cdd6f4"
             font.pixelSize: 15
@@ -88,6 +103,7 @@ PanelWindow {
                         color: modelData.active
                             ? (theme ? theme.accent : "#cba6f7")
                             : (theme ? theme.surface : "#313244")
+                        Behavior on color { ColorAnimation { duration: 150 } }
 
                         Text {
                             id: workspaceLabel
@@ -132,6 +148,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 theme: root.theme
                 services: root.services
+                requested: root.visible && parent.width >= implicitWidth
             }
         }
 
@@ -191,6 +208,8 @@ PanelWindow {
 
                     Text {
                         text: root.sourceMuted ? "" : ""
+                        Layout.preferredWidth: 20
+                        horizontalAlignment: Text.AlignHCenter
                         font.pixelSize: 16
                         font.bold: true
                         color: theme ? theme.text : "#cdd6f4"
@@ -198,6 +217,8 @@ PanelWindow {
 
                     Text {
                         text: root.sourceVolume
+                        Layout.preferredWidth: volumeMetrics.advanceWidth
+                        horizontalAlignment: Text.AlignRight
                         color: theme ? theme.text : "#cdd6f4"
                         font.pixelSize: 12
                         font.bold: true
@@ -233,6 +254,8 @@ PanelWindow {
 
                     Text {
                         text: root.sinkMuted ? "" : ""
+                        Layout.preferredWidth: 20
+                        horizontalAlignment: Text.AlignHCenter
                         font.pixelSize: 16
                         font.bold: true
                         color: theme ? theme.text : "#cdd6f4"
@@ -240,6 +263,8 @@ PanelWindow {
 
                     Text {
                         text: root.sinkVolume
+                        Layout.preferredWidth: volumeMetrics.advanceWidth
+                        horizontalAlignment: Text.AlignRight
                         color: theme ? theme.text : "#cdd6f4"
                         font.pixelSize: 12
                         font.bold: true

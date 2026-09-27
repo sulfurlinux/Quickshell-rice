@@ -177,6 +177,8 @@ Search updates only changed result rows, and scrolling reuses row components. Cl
 
 App names and commands are normalized once when the registry changes, rather than on every keystroke. Clipboard preview requests prioritize rows currently visible in the launcher; priority is recalculated before each decode, and requests for filtered-out entries are discarded.
 
+The thumbnail worker stops after the launcher has been closed and idle for 30 seconds; cached previews remain available. Small interactions use 150 ms transitions, theme backgrounds use 180 ms fades, and wallpapers keep their 350 ms crossfade. Clock, resource, volume, and DND labels reserve steady widths to reduce layout shifts.
+
 To measure performance on your Linux desktop, run:
 
 ```sh
@@ -215,7 +217,9 @@ The music section shows the active MPRIS player's track and artist, with previou
 
 Cava shows a 12-bar spectrum of the default PipeWire output at 15 FPS, producing 25% fewer updates than 20 FPS. Install it with `sudo pacman -S --needed cava` and restart Quickshell if you are updating an existing installation. The bar uses `quickshell/modules/cava-bar.conf`, independently of the terminal Cava config. The spectrum is hidden when the space between the clock and audio controls is too narrow.
 
-CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process. Cava stops when no visible bar has room for its spectrum and restarts when space becomes available. Errors appear in the Quickshell logs.
+CPU and RAM percentages refresh every two seconds. All displays share one resource monitor and one Cava process. Each process stops when no visible bar has room for its respective widget and restarts when space becomes available. Errors appear in the Quickshell logs.
+
+Notification popups fade and slide for 150 ms. Their content unloads after expiry, and history rows are created only while the notification center is open. Notification history remains intact. Icons load asynchronously at the size needed for the display's scale.
 
 ### Notifications and screenshots
 

@@ -11,6 +11,7 @@ Rectangle {
     implicitWidth: 300
     radius: 6
     color: theme ? theme.surface : "#313244"
+    Behavior on color { enabled: root.visible; ColorAnimation { duration: 180 } }
 
     RowLayout {
         anchors.fill: parent

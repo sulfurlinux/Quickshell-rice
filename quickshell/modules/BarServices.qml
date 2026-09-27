@@ -21,12 +21,19 @@ Scope {
     property var spectrum: []
     property bool cavaAvailable: false
     property var spectrumConsumers: []
+    property var resourceConsumers: []
+    readonly property bool resourcesWanted: resourceConsumers.length > 0
     readonly property bool spectrumWanted: spectrumConsumers.length > 0
 
     function setSpectrumDemand(viewer, wanted) {
         const consumers = root.spectrumConsumers.filter(candidate => candidate && candidate !== viewer);
         if (wanted) consumers.push(viewer);
         root.spectrumConsumers = consumers;
+    }
+    function setResourceDemand(viewer, wanted) {
+        const consumers = root.resourceConsumers.filter(candidate => candidate && candidate !== viewer);
+        if (wanted) consumers.push(viewer);
+        root.resourceConsumers = consumers;
     }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
@@ -54,7 +61,7 @@ Scope {
     }
 
     Process {
-        running: true
+        running: root.resourcesWanted
         command: ["python3", "-u", decodeURIComponent(
             Qt.resolvedUrl("resources.py").toString().replace(/^file:\/\//, ""))]
         stdout: SplitParser {
@@ -66,7 +73,7 @@ Scope {
         stderr: SplitParser { onRead: data => console.warn("Bar resources: " + data) }
         onExited: (exitCode, exitStatus) => {
             root.resources = null;
-            console.warn("Bar resource monitor stopped (exit " + exitCode + ")");
+            if (root.resourcesWanted) console.warn("Bar resource monitor stopped (exit " + exitCode + ")");
         }
     }
 
