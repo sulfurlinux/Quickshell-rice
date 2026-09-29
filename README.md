@@ -14,7 +14,7 @@ The setup is a work in progress. See [Roadmap](#roadmap) for planned features.
 
 ## Before installing
 
-Use an existing Arch Linux installation with a working Hyprland session. The Hyprland config in this repository uses Lua (`hypr/hyprland.lua`); your Hyprland installation must support that configuration format.
+Use an existing Arch Linux installation with a working Hyprland session. It is recommended to install the greeter Ly during the installation process. The Hyprland config in this repository uses Lua (`hypr/hyprland.lua`); your Hyprland installation must support that configuration format.
 
 These are personal configs, so monitor names, application choices, and home-directory paths need adjusting. Back up any existing configs you want to keep: the copy commands below overwrite matching files.
 
