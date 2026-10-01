@@ -42,6 +42,7 @@ git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
 cd ..
+rm -rf yay
 yay -S rose-pine-hyprcursor
 ```
 
@@ -59,6 +60,8 @@ cd Quickshell-rice
 mkdir -p "$HOME/.config"
 cp -r hypr quickshell ghostty fish fastfetch btop cava "$HOME/.config/"
 cp starship.toml "$HOME/.config/"
+cd ..
+rm -rf Quickshell-rice
 ```
 
 Keep the cloned repository if you want to pull updates or edit the source later.
@@ -146,7 +149,7 @@ The included preset assigns **1–5 to DP-1** (default **1**) and **6–10 to HD
 ```lua
 {
     monitor = "DP-1",
-    workspaces = { 1, 3, 5 },
+    workspaces = { 1, 2, 3 },
     default = 1,
     persistent = false,
 },
