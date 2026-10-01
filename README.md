@@ -229,6 +229,7 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 ## Todo
 - Add a battery widget
+- Add root protection
 
 ## Roadmap
 
