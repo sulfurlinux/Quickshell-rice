@@ -2,7 +2,7 @@
 
 A personal Linux desktop setup for Arch Linux, Hyprland, and Quickshell. This repository contains the desktop shell and configs for the terminal, prompt, system information tools, and lock screen.
 
-The setup is a work in progress. See [Roadmap](#roadmap) for planned features.
+The setup is a work in progress. See [Todo](#Todo) for planned features.
 
 ## What's included
 
@@ -233,32 +233,3 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 ## Todo
 - Add a battery widget
 - Add root protection
-
-## Roadmap
-
-- [x] Add Screenshot Utility
-- [x] Clipboard
-- [x] Cursor
-- [x] Fancy Text cursor in the Terminal
-- [x] Logout menu
-- [x] Launcher
-  - [x] App Launcher
-  - [x] pkiller
-  - [x] Integratated Calculator
-- [x] Wallpaper system
-  - [x] Wallpaper switcher in launcher
-- [x] Dynamic theme system
-  - [x] Extract color palette from wallpaper
-  - [x] Integratation in Quickshell
-  - [x] Integratation in Hyprland
-- [x] Bar
-  - [x] Music
-  - [x] Dynamic workspaces
-  - [x] Audio meter
-  - [x] Cava
-  - [x] System resource usage
-  - [x] Clock
-- [x] Custom Spotify and Discord scratchpads
-- [x] Notification System
-  - [x] Notification daemon
-  - [x] Notification center
