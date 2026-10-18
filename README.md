@@ -234,3 +234,4 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - Add a battery widget
 - Add root protection
 - Cursor not using the default cursor theme in Chromium Embedded Framework
+- Scratchpad animation
