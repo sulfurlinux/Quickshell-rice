@@ -235,3 +235,4 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - Add root protection
 - Cursor not using the default cursor theme in Chromium Embedded Framework
 - Scratchpad animation
+- Clone ER?
