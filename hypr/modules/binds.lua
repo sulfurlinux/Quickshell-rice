@@ -73,7 +73,7 @@ hl.bind(mainMod .. "+ M", hl.dsp.exec_cmd("spotify"))
 
 hl.bind(mainMod.. "+ D", hl.dsp.workspace.toggle_special(""))
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.window.move({ workspace = "special:" }))
-hl.bind(mainMod.. "+ D", hl.dsp.exec_cmd("discord"))
+hl.bind(mainMod.. "+ D", hl.dsp.exec_cmd("vesktop"))
 
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special(""))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:" }))

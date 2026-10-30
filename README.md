@@ -236,3 +236,4 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - Cursor not using the default cursor theme in Chromium Embedded Framework
 - Scratchpad animation
 - Possible Cloning Error?  (L reported an encounterd Error Code including numbers???)
+- Blur not working in a few problems

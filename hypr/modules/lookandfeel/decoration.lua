@@ -3,8 +3,8 @@ hl.config({
     decoration = {
         rounding = 8,
         rounding_power = 2,
-        active_opacity = 1.0,
-        inactive_opacity = 0.9,
+        active_opacity = 0.85,
+        inactive_opacity = 0.65,
         shadow = {
             enabled = true,
             range = 4,
@@ -16,6 +16,7 @@ hl.config({
             size = 8,
             passes = 2,
             vibrancy = 0.1696,
+            variant = "drops",
         },
     },
 })
