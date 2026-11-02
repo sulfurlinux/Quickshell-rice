@@ -1,7 +1,7 @@
 -- Applications used by the Hyprland configuration.
 
 return {
-    browser = "firefox",
+    browser = "zen-browser",
     terminal = "kitty",
     fileManager = "nautilus -w",
     editor = "zeditor",
