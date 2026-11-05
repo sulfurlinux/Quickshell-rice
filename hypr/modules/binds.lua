@@ -67,7 +67,7 @@ hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
 -- Scratchpad window rules and keybindings.
 
-hl.bind(mainMod.. "+ M", hl.dsp.workspace.toggle_special(""))
+hl.bind(mainMod .. "+ M", hl.dsp.workspace.toggle_special(""))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "special:" }))
 hl.bind(mainMod .. "+ M", hl.dsp.exec_cmd("spotify"))
 
