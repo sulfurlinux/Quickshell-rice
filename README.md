@@ -127,6 +127,8 @@ chsh -s /usr/bin/fish
 
 The shell change takes effect the next time you log in.
 
+Fish's `rm` and `sudo rm` commands block removal of the root directory and protected system paths such as `/etc`, `/usr`, and `/var`. `sudo rm` also blocks home-directory trees; ordinary `rm` can still remove files inside your home directory. This is an accidental-deletion guard for Fish, not a security boundary: other shells, scripts, `sudo sh -c`, and explicitly invoking `/usr/bin/rm` bypass it.
+
 From your Hyprland session, apply the cursor and GTK appearance:
 
 ```bash
