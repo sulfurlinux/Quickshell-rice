@@ -139,6 +139,8 @@ gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 ```
 
+Hyprland also disables GTK's Wayland background-effect protocol so GTK apps use the compositor's blur settings. Restart Ghostty and Nautilus after updating the config; a full logout and login refreshes their inherited environment.
+
 ### 5. Load the setup
 
 Reload Hyprland:
@@ -249,4 +251,3 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 - Scratchpad animation
 - Possible Cloning Error?  (Lappen reported an encounterd Error Code including numbers???)
-- Blur not working in a few programs (Ghostty/Nautilus)
