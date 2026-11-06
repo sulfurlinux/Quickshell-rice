@@ -246,5 +246,5 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 - Add a battery widget
 - Add root protection
 - Scratchpad animation
-- Possible Cloning Error?  (L reported an encounterd Error Code including numbers???)
-- Blur not working in a few problems
+- Possible Cloning Error?  (Lappen reported an encounterd Error Code including numbers???)
+- Blur not working in a few programs
