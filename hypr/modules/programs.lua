@@ -2,7 +2,7 @@
 
 return {
     browser = "zen-browser",
-    terminal = "kitty",
+    terminal = "ghustty",
     fileManager = "nautilus -w",
     editor = "zeditor",
     menu = "quickshell ipc call launcher toggle",
