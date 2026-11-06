@@ -2,7 +2,7 @@
 
 A personal Linux desktop setup for Arch Linux, Hyprland, and Quickshell. This repository contains the desktop shell and configs for the terminal, prompt, system information tools, and lock screen.
 
-The setup is a work in progress. See [Todo](#Todo) for planned features.
+The setup is a work in progress. See [Todo](#todo) for planned features.
 
 ## What's included
 
@@ -231,6 +231,7 @@ The notification center shows arrival timestamps. Use its **DND on/off** button 
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
 
 ## Todo
+
 - Add a battery widget
 - Add root protection
 - Cursor not using the default cursor theme in Chromium Embedded Framework
