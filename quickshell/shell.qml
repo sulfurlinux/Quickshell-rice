@@ -7,6 +7,7 @@ Scope {
     id: root
 
     property bool showOnAllScreens: true
+    property bool batteryWidgetEnabled: true
     property string primaryMonitorName: "DP-1"
     readonly property var primaryScreen: Quickshell.screens.find(s => s.name === primaryMonitorName)
         ?? Quickshell.screens[0] ?? null
@@ -202,6 +203,7 @@ Scope {
                 theme: root.currentTheme
                 launcher: globalLauncher
                 screenshot: screenshotTool
+                batteryWidgetEnabled: root.batteryWidgetEnabled
             }
         }
     }

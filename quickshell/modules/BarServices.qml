@@ -3,10 +3,12 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 
 Scope {
     id: root
     readonly property string currentTime: Qt.formatDateTime(systemClock.date, "HH:mm")
+    readonly property var battery: UPower.displayDevice
     SystemClock {
         id: systemClock
         precision: SystemClock.Minutes

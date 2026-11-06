@@ -3,6 +3,7 @@ BarServices 1.0 BarServices.qml
 BarButton 1.0 BarButton.qml
 BarMusic 1.0 BarMusic.qml
 BarResources 1.0 BarResources.qml
+BarBattery 1.0 BarBattery.qml
 BarSpectrum 1.0 BarSpectrum.qml
 Launcher 1.0 Launcher.qml
 Notifications 1.0 Notifications.qml

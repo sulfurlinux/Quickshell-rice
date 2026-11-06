@@ -6,7 +6,7 @@ The setup is a work in progress. See [Todo](#todo) for planned features.
 
 ## What's included
 
-- **Quickshell:** a bar with workspaces, clock, audio and music controls, Cava, and system resource usage; an app launcher; notifications; screenshots; and a wallpaper picker.
+- **Quickshell:** a bar with workspaces, clock, audio and music controls, Cava, system resources, and battery status; an app launcher; notifications; screenshots; and a wallpaper picker.
 - **Hyprland:** window rules, keyboard shortcuts, Spotify and Discord scratchpads, and a Hyprlock config.
 - **Wallpaper colors:** a Python script that derives an accent color for Quickshell, Hyprland borders and shadows, and Hyprlock.
 - **Terminal:** Ghostty with cursor shaders, Fish, and a Starship prompt.
@@ -29,7 +29,7 @@ Install the applications used by the setup, plus screenshot, audio, brightness, 
 ```bash
 sudo pacman -S --needed quickshell ghostty hyprlock ly fish fastfetch \
   ttf-jetbrains-mono-nerd nautilus zed starship firefox \
-  grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl cava python \
+  grim slurp hyprpicker wl-clipboard cliphist xdg-utils util-linux wireplumber brightnessctl playerctl cava upower python \
   xorg-xrandr git base-devel
 ```
 
@@ -225,6 +225,8 @@ Image previews use Pillow from the same `~/.cache/quickshell_venv` environment a
 
 Speaker and microphone controls use Quickshell's native PipeWire service. Volume and mute state update when they change, with one shared tracker for all displays. Click to toggle mute; scroll to adjust volume in 5% steps, capped at 100%. Controls follow the default devices and are disabled while a device is unavailable.
 
+The battery indicator appears after CPU/RAM in its own field when UPower reports a laptop battery. Set `batteryWidgetEnabled` to `false` near the top of `~/.config/quickshell/shell.qml` to disable it on desktops. Quickshell reads the level and charging state from UPower.
+
 The clock uses a shared native `SystemClock` at minute precision, without spawning commands or polling every second.
 
 The music section shows the active MPRIS player's track and artist, with previous, play/pause, and next controls. Click the track to open its player; right-click it to switch between players. It disappears when no player is available, and unsupported controls are disabled.
@@ -243,7 +245,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 ## Todo
 
-- Add a battery widget
 - Add root protection
 - Scratchpad animation
 - Possible Cloning Error?  (Lappen reported an encounterd Error Code including numbers???)

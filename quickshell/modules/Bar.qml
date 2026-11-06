@@ -10,6 +10,7 @@ PanelWindow {
     property var launcher
     property var screenshot
     property var services
+    property bool batteryWidgetEnabled: true
 
     readonly property string currentTime: services ? services.currentTime : "--:--"
     readonly property var sinkAudio: services ? services.sinkAudio : null
@@ -76,7 +77,7 @@ PanelWindow {
         Flickable {
             id: workspaces
             anchors.left: parent.left
-            width: Math.max(0, Math.min(workspaceRow.width, clock.x - resources.implicitWidth - 46))
+            width: Math.max(0, Math.min(workspaceRow.width, clock.x - statusWidgets.implicitWidth - 46))
             anchors.leftMargin: 10
 
             anchors.verticalCenter: parent.verticalCenter
@@ -136,6 +137,7 @@ PanelWindow {
         }
 
         Item {
+            id: statusArea
             anchors.left: workspaces.right
             anchors.right: clock.left
             anchors.leftMargin: 12
@@ -143,12 +145,26 @@ PanelWindow {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             clip: true
-            BarResources {
-                id: resources
+            Row {
+                id: statusWidgets
                 anchors.centerIn: parent
-                theme: root.theme
-                services: root.services
-                requested: root.visible && parent.width >= implicitWidth
+                spacing: 8
+
+                BarResources {
+                    id: resources
+                    theme: root.theme
+                    services: root.services
+                    requested: root.visible && statusArea.width >= implicitWidth
+                        + (battery.visible ? 8 + battery.implicitWidth : 0)
+                }
+
+                BarBattery {
+                    id: battery
+                    theme: root.theme
+                    services: root.services
+                    requested: root.visible && root.batteryWidgetEnabled
+                        && statusArea.width >= resources.implicitWidth + 8 + implicitWidth
+                }
             }
         }
 
