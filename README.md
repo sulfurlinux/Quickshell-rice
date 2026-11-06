@@ -47,6 +47,14 @@ yay -S rose-pine-hyprcursor
 yay -S rose-pine-cursor
 ```
 
+Steam's embedded browser may ignore `XCURSOR_THEME` and use the Xcursor theme named `default`. Install the matching fallback after installing `rose-pine-cursor`:
+
+```bash
+bash scripts/install-steam-cursor.sh
+```
+
+The script copies the theme files into `~/.local/share/icons/default` and stops if that directory already exists, so it will not overwrite an existing default cursor theme. Restart Steam after installation.
+
 Read package-manager prompts before accepting them. Press Enter when the displayed default is the option you want.
 
 ![Example package installation prompt](Install.png)
