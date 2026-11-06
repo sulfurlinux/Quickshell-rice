@@ -249,4 +249,4 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 ## Todo
 
-- Possible Cloning Error? (Lappen reported an encounterd Error Code including numbers???)
+- Possible Cloning Error? (Lappen reported an encounterd Error Code including numbers[Update was made before| Strings and Invallid numbers]???)
