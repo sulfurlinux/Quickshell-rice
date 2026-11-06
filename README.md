@@ -201,7 +201,7 @@ python3 ~/.config/quickshell/modules/profile_shell.py
 
 Follow the three prompts for 15 seconds each: idle, launcher search, and wallpaper switching. The profiler reports average and peak CPU usage plus peak resident memory for Quickshell and its sampled child processes. Samples are saved to `~/.cache/quickshell-profile.csv`. Use `--pid PID` if multiple Quickshell instances are running, or `--seconds 30` for longer phases. CPU usage of 100% means one fully used core; summed resident memory includes shared pages, and processes that exit between samples may be missed. Run the same actions before and after a change to compare performance; this measures process load rather than animation frame timing.
 
-Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
+Type `/pkill` to list running windowed apps. Search by app name, window title, or PID, then click a row or select it with the arrow keys and press Enter to terminate that app process with SIGTERM. Windows sharing a process appear once. Root-owned processes are excluded, and process management is disabled if Quickshell runs with root privileges. Escape or “Back to commands” returns to launcher commands. Failures show a short message; full details appear in the Quickshell logs.
 
 All power and session actions run immediately without a confirmation dialog.
 
@@ -245,7 +245,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 ## Todo
 
-- Add root protection
 - Scratchpad animation
 - Possible Cloning Error?  (Lappen reported an encounterd Error Code including numbers???)
 - Blur not working in a few programs (Ghostty/Nautilus)
