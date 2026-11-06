@@ -44,6 +44,7 @@ makepkg -si
 cd ..
 rm -rf yay
 yay -S rose-pine-hyprcursor
+yay -S rose-pine-cursor
 ```
 
 Read package-manager prompts before accepting them. Press Enter when the displayed default is the option you want.
@@ -122,6 +123,8 @@ From your Hyprland session, apply the cursor and GTK appearance:
 
 ```bash
 hyprctl setcursor rose-pine-hyprcursor 28
+gsettings set org.gnome.desktop.interface cursor-theme 'BreezeX-RosePine-Linux'
+gsettings set org.gnome.desktop.interface cursor-size 28
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 ```
@@ -234,7 +237,6 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 
 - Add a battery widget
 - Add root protection
-- Cursor not using the default cursor theme in Chromium Embedded Framework
 - Scratchpad animation
 - Possible Cloning Error?  (L reported an encounterd Error Code including numbers???)
 - Blur not working in a few problems
