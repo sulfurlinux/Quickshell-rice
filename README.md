@@ -250,4 +250,5 @@ Area screenshots freeze all displays while you select. Press `Escape` to cancel;
 ## Todo
 
 - Scratchpad animation
-- Possible Cloning Error?  (Lappen reported an encounterd Error Code including numbers???)
+- Possible Cloning Error? (Lappen reported an encounterd Error Code including numbers???)
+- Blur not working in a few programs (Ghostty/Nautilus)
