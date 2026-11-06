@@ -2,7 +2,7 @@
 
 A personal Linux desktop setup for Arch Linux, Hyprland, and Quickshell. This repository contains the desktop shell and configs for the terminal, prompt, system information tools, and lock screen.
 
-The setup is a work in progress. See [Todo](#todo) for planned features.
+The setup is a work in progress.
 
 ## What's included
 
@@ -246,7 +246,3 @@ Notification popups fade and slide for 150 ms. Their content unloads after expir
 The notification center shows arrival timestamps. Use its **DND on/off** button to suppress notification popups while keeping them in history. Turning DND off resumes new popups without replaying earlier notifications.
 
 Area screenshots freeze all displays while you select. Press `Escape` to cancel; repeated screenshot requests are ignored until the current capture finishes. Save-and-copy uses one capture for both the file and clipboard. `hyprpicker` provides the frozen backdrop, and `flock` (from `util-linux`) prevents overlapping captures.
-
-## Todo
-
-- Possible Cloning Error? (Lappen reported an encounterd Error Code including numbers[Update was made before| Strings and Invallid numbers]???)

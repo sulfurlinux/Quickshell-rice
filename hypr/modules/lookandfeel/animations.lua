@@ -15,7 +15,7 @@ hl.curve("easy", {
     type = "spring",
     mass = 1,
     stiffness = 238.1191,
-    dampening = 24.21279333,
+    damping = 24.21279333,
 })
 
 -- Animations
